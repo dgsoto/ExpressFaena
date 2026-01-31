@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Faena | Suministros Minería</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+    
+    <meta name="description" content="Tienda de suministros express para faenas mineras. Cigarros, snacks y pedidos personalizados.">
+    <meta name="keywords" content="mineria, faena, chile, snacks, cuenta rut, despacho campamento">
+    <meta property="og:title" content="Express Faena - Pedidos por WhatsApp">
+    <meta property="og:description" content="Haz tu pedido hoy y recibe mañana en el campamento.">
+    <meta property="og:image" content="https://tu-usuario.github.io/tienda-faena/assets/banner.jpg">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 pb-32">
+
+    <header class="bg-[#facc15] p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
+        <h1 class="text-2xl font-black text-black text-center">🛒 EXPRESS FAENA</h1>
+        <p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto mt-2 font-bold uppercase tracking-widest">Entrega Mañana 08:00 AM</p>
+    </header>
+
+    <main id="catalogo" class="p-4 grid grid-cols-2 gap-4">
+    </main>
+
+    <section class="p-4 space-y-4">
+        <div class="bg-black p-4 rounded-xl shadow-sm">
+            <h3 class="text-xs font-black text-[#facc15] mb-2 uppercase tracking-widest">Sugerencias</h3>
+            <div class="flex gap-2">
+                <input type="text" id="input-sugerencia" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="¿Qué quieres que traigamos?">
+                <button onclick="enviarSugerencia()" class="bg-[#facc15] text-black px-4 rounded-lg font-bold active:scale-95 transition-transform"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div id="sugerencia-notification" class="hidden text-green-400 text-sm font-bold mt-3 flex items-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                <span>¡Gracias por tu sugerencia!</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="text-xl font-bold">Tu Pedido</h2>
+                <button onclick="hideCart()" class="text-2xl font-bold">&times;</button>
+            </div>
+            <div id="cart-items" class="p-4 space-y-3 overflow-y-auto">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="p-4 border-t">
+                 <h3 class="text-xs font-black text-blue-600 mb-2 uppercase tracking-widest">Pedido Especial</h3>
+                 <textarea id="pedido-especial" class="w-full bg-gray-50 p-3 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-600" placeholder="¿Falta algo? (Ej: Cerveza, cargador, etc.)"></textarea>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-b-2xl">
+                 <button onclick="enviarWhatsApp()" class="bg-[#25D366] text-white w-full py-4 rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fab fa-whatsapp text-xl"></i> PEDIR POR WHATSAPP
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md p-5 border-t border-gray-100 z-50">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase leading-none">Total Pedido</p>
+                <p id="total-carrito" class="text-2xl font-black text-green-600 leading-none">$0</p>
+            </div>
+            <button onclick="showCart()" class="bg-black text-white px-8 py-3 rounded-2xl font-black shadow-lg flex items-center gap-2 active:scale-95 transition-all">
+                <i class="fas fa-shopping-cart"></i> VER PEDIDO
+            </button>
+        </div>
+    </nav>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
