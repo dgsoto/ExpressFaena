@@ -1,6 +1,6 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- FIREBASE CONFIG ---
 const firebaseConfig = {
@@ -22,36 +22,41 @@ const productForm = document.getElementById('product-form');
 const productIdInput = document.getElementById('product-id');
 const productNameInput = document.getElementById('product-name');
 const productPriceInput = document.getElementById('product-price');
-const productImageInput = document.getElementById('product-image');
+const productVideoInput = document.getElementById('product-video');
+const productImagesTextarea = document.getElementById('product-images');
 const productsList = document.getElementById('products-list');
 const cancelEditBtn = document.getElementById('cancel-edit');
 
-// --- PREVIEW ELEMENTS ---
-const previewImage = document.getElementById('preview-image');
-const previewName = document.getElementById('preview-name');
-const previewPrice = document.getElementById('preview-price');
-
 // --- LOAD AND DISPLAY PRODUCTS (REAL-TIME) ---
+// We query the products and order them by name for consistent display.
 const q = query(collection(db, "productos"), orderBy("nombre"));
 onSnapshot(q, (querySnapshot) => {
     productsList.innerHTML = "";
     if (querySnapshot.empty) {
         productsList.innerHTML = `<p class="text-center text-gray-500">No hay productos para mostrar.</p>`;
+        return;
     }
     querySnapshot.forEach((doc) => {
         const product = doc.data();
         const productId = doc.id;
+
+        // Use the first image from the 'images' array for the thumbnail.
+        // If there are no images, show a placeholder.
+        const thumbnailUrl = (product.images && product.images.length > 0)
+            ? product.images[0]
+            : 'https://via.placeholder.com/150?text=No+Image';
+
         productsList.innerHTML += `
             <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                 <div class="flex items-center gap-4">
-                    <img src="${product.img || 'https://via.placeholder.com/150'}" alt="${product.nombre}" class="w-12 h-12 object-cover rounded-md">
+                    <img src="${thumbnailUrl}" alt="${product.nombre}" class="w-12 h-12 object-cover rounded-md">
                     <div>
                         <p class="font-bold text-gray-800">${product.nombre}</p>
                         <p class="text-sm text-gray-600">$${product.precio.toLocaleString('es-CL')}</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="window.editProduct('${productId}', '${product.nombre}', ${product.precio}, '${product.img || ''}')" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-pencil-alt"></i></button>
+                    <button onclick="window.editProduct('${productId}')" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-pencil-alt"></i></button>
                     <button onclick="window.deleteProduct('${productId}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
@@ -66,22 +71,38 @@ productForm.addEventListener('submit', async (e) => {
     const id = productIdInput.value;
     const name = productNameInput.value.trim();
     const price = parseFloat(productPriceInput.value);
-    const image = productImageInput.value.trim();
+    const video = productVideoInput.value.trim();
+
+    // Process the textarea for image URLs:
+    // 1. Split the string into an array by newlines.
+    // 2. Trim whitespace from each URL.
+    // 3. Filter out any empty lines.
+    const images = productImagesTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
 
     if (!name || isNaN(price) || price <= 0) {
         alert("Por favor, completa el nombre y el precio correctamente.");
         return;
     }
+    if (images.length > 15) {
+        alert("Puedes agregar un máximo de 15 imágenes.");
+        return;
+    }
 
-    const productData = { nombre: name, precio: price, img: image };
+    // This is the new data structure for our product document.
+    const productData = { 
+        nombre: name, 
+        precio: price, 
+        video: video, // Can be an empty string if no video is provided.
+        images: images  // An array of image URLs.
+    };
 
     try {
         if (id) {
-            // Update existing product
+            // If an ID exists, we are updating an existing product.
             await updateDoc(doc(db, "productos", id), productData);
             alert("¡Producto actualizado con éxito!");
         } else {
-            // Add new product
+            // Otherwise, we are adding a new product.
             await addDoc(collection(db, "productos"), productData);
             alert("¡Producto agregado con éxito!");
         }
@@ -93,15 +114,34 @@ productForm.addEventListener('submit', async (e) => {
 });
 
 // --- EDIT FUNCTION ---
-window.editProduct = (id, name, price, image) => {
-    productIdInput.value = id;
-    productNameInput.value = name;
-    productPriceInput.value = price;
-    productImageInput.value = image;
+// When the edit button is clicked, we fetch the latest product data from Firestore.
+window.editProduct = async (id) => {
+    try {
+        const docRef = doc(db, "productos", id);
+        const docSnap = await getDoc(docRef);
 
-    productForm.querySelector('button[type="submit"]').innerText = "Actualizar Producto";
-    cancelEditBtn.classList.remove('hidden');
-    window.scrollTo(0, 0);
+        if (docSnap.exists()) {
+            const product = docSnap.data();
+            
+            // Populate the form with the product's data.
+            productIdInput.value = id;
+            productNameInput.value = product.nombre;
+            productPriceInput.value = product.precio;
+            productVideoInput.value = product.video || '';
+            // Join the array of image URLs into a newline-separated string for the textarea.
+            productImagesTextarea.value = (product.images || []).join('\n');
+
+            // Update UI to show that we are in edit mode.
+            productForm.querySelector('button[type="submit"]').innerText = "Actualizar Producto";
+            cancelEditBtn.classList.remove('hidden');
+            window.scrollTo(0, 0); // Scroll to the top to see the form.
+        } else {
+            alert("El producto que intentas editar no fue encontrado.");
+        }
+    } catch (error) {
+        console.error("Error al cargar datos para editar: ", error);
+        alert("Error al cargar los datos del producto.");
+    }
 }
 
 // --- DELETE FUNCTION ---
@@ -117,34 +157,15 @@ window.deleteProduct = async (id) => {
     }
 }
 
-// --- CANCEL EDIT ---
-cancelEditBtn.addEventListener('click', () => {
-    resetForm();
-});
+// --- RESET FORM FUNCTION ---
+window.resetForm = () => {
+    productForm.reset(); // This clears all inputs within the form.
+    productIdInput.value = ''; // Explicitly clear the hidden ID input.
 
-// --- RESET FORM ---
-function resetForm() {
-    productForm.reset();
-    productIdInput.value = '';
+    // Reset UI to be in "add new" mode.
     productForm.querySelector('button[type="submit"]').innerText = "Guardar Producto";
     cancelEditBtn.classList.add('hidden');
-    updatePreview(); // Reset preview to default
 }
 
-// --- LIVE PREVIEW ---
-function updatePreview() {
-    const name = productNameInput.value.trim();
-    const price = parseFloat(productPriceInput.value);
-    const image = productImageInput.value.trim();
-
-    previewName.textContent = name || "Nombre Producto";
-    previewPrice.textContent = isNaN(price) || price <= 0 ? "$0" : `$${price.toLocaleString('es-CL')}`;
-    previewImage.src = image || 'https://via.placeholder.com/150?text=IMAGEN';
-}
-
-productNameInput.addEventListener('input', updatePreview);
-productPriceInput.addEventListener('input', updatePreview);
-productImageInput.addEventListener('input', updatePreview);
-
-// Initial preview update
-updatePreview();
+// Add a listener to the cancel button.
+cancelEditBtn.addEventListener('click', window.resetForm);

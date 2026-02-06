@@ -26,9 +26,12 @@ const cartItemsContainer = document.getElementById('cart-items');
 const pedidoEspecialTextarea = document.getElementById('pedido-especial');
 const sugerenciaInput = document.getElementById('input-sugerencia');
 const sugerenciaNotification = document.getElementById('sugerencia-notification');
-const imageModal = document.getElementById('image-modal');
-const modalImage = document.getElementById('modal-image');
 const headerMessagesContainer = document.getElementById('header-messages');
+const productDetailModal = document.getElementById('product-detail-modal');
+const mediaCarousel = document.getElementById('media-carousel');
+const carouselIndicators = document.getElementById('carousel-indicators');
+const detailProductName = document.getElementById('detail-product-name');
+const detailProductPrice = document.getElementById('detail-product-price');
 
 // --- HEADER MESSAGES ---
 function manageHeaderMessages() {
@@ -81,15 +84,21 @@ async function loadProducts() {
         catalogoGrid.innerHTML = "";
         snap.forEach(doc => {
             const p = doc.data();
+            const productId = doc.id;
+            const thumbnailUrl = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/150';
+
             catalogoGrid.innerHTML += `
                 <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center text-center">
-                    <img src="${p.img || 'https://via.placeholder.com/150'}" 
+                    <img src="${thumbnailUrl}" 
                          alt="${p.nombre}" 
-                         onclick="showImageModal('${p.img || 'https://via.placeholder.com/150'}')" 
-                         class="w-full h-28 object-cover rounded-lg mb-3 cursor-pointer shadow-sm">
+                         class="w-full h-28 object-cover rounded-lg mb-3 cursor-pointer shadow-sm"
+                         onclick="showProductDetail('${productId}')">
                     <h4 class="text-sm font-bold text-gray-800 leading-tight">${p.nombre}</h4>
                     <p class="text-lg font-black text-gray-900 mt-1">$${p.precio.toLocaleString('es-CL')}</p>
-                    <button onclick="addToCart('${p.nombre}', ${p.precio})" class="bg-[#facc15] w-full mt-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide active:scale-95 transition-transform shadow-sm">Agregar</button>
+                     <div class="flex gap-2 w-full mt-3">
+                        <button onclick="showProductDetail('${productId}')" class="bg-gray-200 w-1/2 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide active:scale-95 transition-transform shadow-sm">Ver</button>
+                        <button onclick="addToCart('${p.nombre}', ${p.precio})" class="bg-[#facc15] w-1/2 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide active:scale-95 transition-transform shadow-sm">Agregar</button>
+                    </div>
                 </div>
             `;
         });
@@ -99,19 +108,71 @@ async function loadProducts() {
     }
 }
 
-// --- IMAGE MODAL ---
-window.showImageModal = (src) => {
-    if (modalImage && imageModal) {
-        modalImage.src = src;
-        imageModal.classList.remove('hidden');
-    }
-}
+// --- PRODUCT DETAIL MODAL --- 
+window.showProductDetail = async (productId) => {
+    const docRef = doc(db, "productos", productId);
+    const docSnap = await getDoc(docRef);
 
-window.hideImageModal = () => {
-    if (imageModal) {
-        imageModal.classList.add('hidden');
+    if (docSnap.exists()) {
+        const product = docSnap.data();
+        
+        detailProductName.textContent = product.nombre;
+        detailProductPrice.textContent = `$${product.precio.toLocaleString('es-CL')}`;
+        
+        let mediaItems = [];
+        if (product.video) {
+            mediaItems.push({ type: 'video', src: product.video });
+        }
+        if (product.images) {
+            mediaItems = [...mediaItems, ...product.images.map(img => ({ type: 'image', src: img }))];
+        }
+
+        mediaCarousel.innerHTML = '';
+        carouselIndicators.innerHTML = '';
+        
+        mediaItems.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+            itemDiv.style.opacity = index === 0 ? '1' : '0'; // Animation style
+
+            if (item.type === 'video') {
+                itemDiv.innerHTML = `<video controls class="w-full h-auto rounded-t-2xl"><source src="${item.src}" type="video/mp4"></video>`;
+            } else {
+                itemDiv.innerHTML = `<img src="${item.src}" class="w-full h-auto rounded-t-2xl">`;
+            }
+            mediaCarousel.appendChild(itemDiv);
+
+            const indicator = document.createElement('button');
+            indicator.className = `w-3 h-3 rounded-full ${index === 0 ? 'bg-black' : 'bg-gray-300'}`;
+            indicator.onclick = () => showMediaItem(index);
+            carouselIndicators.appendChild(indicator);
+        });
+
+        productDetailModal.classList.remove('hidden');
     }
-}
+};
+
+window.hideProductDetail = () => {
+    productDetailModal.classList.add('hidden');
+    // Stop any playing video when closing the modal
+    const video = mediaCarousel.querySelector('video');
+    if (video) {
+        video.pause();
+    }
+};
+
+window.showMediaItem = (index) => {
+    const items = mediaCarousel.querySelectorAll('.carousel-item');
+    const indicators = carouselIndicators.querySelectorAll('button');
+
+    items.forEach((item, i) => {
+        item.style.opacity = i === index ? '1' : '0';
+    });
+
+    indicators.forEach((indicator, i) => {
+        indicator.className = `w-3 h-3 rounded-full ${i === index ? 'bg-black' : 'bg-gray-300'}`;
+    });
+};
 
 // --- CART LOGIC ---
 window.addToCart = (nombre, precio) => {

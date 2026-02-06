@@ -51,6 +51,14 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(10px); }
         }
+        /* Carousel styles */
+        .carousel-item {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .carousel-item.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-100 pb-32">
@@ -86,7 +94,7 @@
                 <h2 class="text-xl font-bold">Tu Pedido</h2>
                 <button onclick="hideCart()" class="text-2xl font-bold">&times;</button>
             </div>
-            <div id="cart-items" class="p-4 space-y-3 overflow-y-auto">
+            <div id="cart-items" class="p-4 space-y-3 overflow-y-auto flex-1">
             </div>
             <div class="p-4 border-t">
                  <h3 class="text-xs font-black text-blue-600 mb-2 uppercase tracking-widest">Pedido Especial</h3>
@@ -100,10 +108,20 @@
         </div>
     </div>
 
-    <!-- Image Viewer Modal -->
-    <div id="image-modal" onclick="hideImageModal()" class="hidden fixed inset-0 bg-black bg-opacity-75 z-[60] flex items-center justify-center p-4 cursor-pointer">
-        <div class="relative">
-            <img id="modal-image" src="" alt="Vista ampliada del producto" class="max-w-[90vw] max-h-[80vh] rounded-xl shadow-lg">
+    <!-- Product Detail Modal -->
+    <div id="product-detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative">
+            <button onclick="hideProductDetail()" class="absolute top-2 right-2 text-2xl font-bold z-10">&times;</button>
+            <div id="media-carousel" class="relative w-full bg-black">
+                <!-- Media items will be injected here -->
+            </div>
+            <div class="flex justify-center p-2 space-x-2" id="carousel-indicators">
+                <!-- Indicator dots will be injected here -->
+            </div>
+            <div class="p-4">
+                <h2 id="detail-product-name" class="text-xl font-bold"></h2>
+                <p id="detail-product-price" class="text-lg font-black"></p>
+            </div>
         </div>
     </div>
 
