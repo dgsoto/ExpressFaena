@@ -1,6 +1,6 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- FIREBASE CONFIG ---
 const firebaseConfig = {
@@ -26,6 +26,52 @@ const cartItemsContainer = document.getElementById('cart-items');
 const pedidoEspecialTextarea = document.getElementById('pedido-especial');
 const sugerenciaInput = document.getElementById('input-sugerencia');
 const sugerenciaNotification = document.getElementById('sugerencia-notification');
+const imageModal = document.getElementById('image-modal');
+const modalImage = document.getElementById('modal-image');
+const headerMessagesContainer = document.getElementById('header-messages');
+
+// --- HEADER MESSAGES ---
+function manageHeaderMessages() {
+    const q = query(collection(db, "mensajes"), where("active", "==", true));
+    onSnapshot(q, (snapshot) => {
+        const activeMessages = snapshot.docs.map(doc => doc.data().text);
+        if (!headerMessagesContainer) return;
+
+        headerMessagesContainer.innerHTML = ''; // Clear previous messages
+        let currentMessageIndex = 0;
+
+        if (activeMessages.length === 0) {
+            headerMessagesContainer.innerHTML = `<p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto font-bold uppercase tracking-widest">Entrega Mañana 08:00 AM</p>`;
+            return;
+        }
+
+        if (activeMessages.length === 1) {
+            headerMessagesContainer.innerHTML = `<p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto font-bold uppercase tracking-widest">${activeMessages[0]}</p>`;
+            return;
+        }
+
+        // Cycle through messages if more than one
+        const displayMessage = () => {
+            const messageP = document.createElement('p');
+            messageP.className = 'text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto font-bold uppercase tracking-widest';
+            messageP.textContent = activeMessages[currentMessageIndex];
+            
+            headerMessagesContainer.innerHTML = '';
+            headerMessagesContainer.appendChild(messageP);
+            messageP.classList.add('fade-in');
+
+            setTimeout(() => {
+                messageP.classList.remove('fade-in');
+                messageP.classList.add('fade-out');
+            }, 4500); // Start fade out before next message
+
+            currentMessageIndex = (currentMessageIndex + 1) % activeMessages.length;
+        };
+
+        displayMessage(); // Show first message immediately
+        setInterval(displayMessage, 5000);
+    });
+}
 
 // --- PRODUCT LOADING ---
 async function loadProducts() {
@@ -36,17 +82,34 @@ async function loadProducts() {
         snap.forEach(doc => {
             const p = doc.data();
             catalogoGrid.innerHTML += `
-                <div class="card-prod">
-                    ${p.img ? `<img src="${p.img}" alt="${p.nombre}" class="w-full h-24 object-cover">` : '<div class="text-4xl text-center py-4">📦</div>'}
-                    <h4 class="text-[11px] font-black uppercase text-gray-800 leading-none">${p.nombre}</h4>
-                    <p class="text-lg font-bold text-gray-900 mt-1">$${p.precio.toLocaleString('es-CL')}</p>
-                    <button onclick="addToCart('${p.nombre}', ${p.precio})" class="bg-[#facc15] w-full mt-2 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter active:scale-95 transition-transform">Agregar +</button>
+                <div class="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center text-center">
+                    <img src="${p.img || 'https://via.placeholder.com/150'}" 
+                         alt="${p.nombre}" 
+                         onclick="showImageModal('${p.img || 'https://via.placeholder.com/150'}')" 
+                         class="w-full h-28 object-cover rounded-lg mb-3 cursor-pointer shadow-sm">
+                    <h4 class="text-sm font-bold text-gray-800 leading-tight">${p.nombre}</h4>
+                    <p class="text-lg font-black text-gray-900 mt-1">$${p.precio.toLocaleString('es-CL')}</p>
+                    <button onclick="addToCart('${p.nombre}', ${p.precio})" class="bg-[#facc15] w-full mt-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide active:scale-95 transition-transform shadow-sm">Agregar</button>
                 </div>
             `;
         });
     } catch (e) {
         catalogoGrid.innerHTML = "<p class='col-span-2 text-center text-red-500'>Error de conexión al cargar productos.</p>";
         console.error(e);
+    }
+}
+
+// --- IMAGE MODAL ---
+window.showImageModal = (src) => {
+    if (modalImage && imageModal) {
+        modalImage.src = src;
+        imageModal.classList.remove('hidden');
+    }
+}
+
+window.hideImageModal = () => {
+    if (imageModal) {
+        imageModal.classList.add('hidden');
     }
 }
 
@@ -185,4 +248,5 @@ window.enviarWhatsApp = () => {
 document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
     updateTotal();
+    manageHeaderMessages();
 });

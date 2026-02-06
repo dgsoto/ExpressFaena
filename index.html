@@ -7,6 +7,18 @@
     <title>Express Faena | Suministros Minería</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Theme Color for browsers -->
+    <meta name="theme-color" content="#facc15">
+
+    <!-- iOS-specific tags for PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Express Faena">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
     <meta name="description" content="Tienda de suministros express para faenas mineras. Cigarros, snacks y pedidos personalizados.">
     <meta name="keywords" content="mineria, faena, chile, snacks, cuenta rut, despacho campamento">
     <meta property="og:title" content="Express Faena - Pedidos por WhatsApp">
@@ -24,12 +36,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 pb-32">
 
     <header class="bg-[#facc15] p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
         <h1 class="text-2xl font-black text-black text-center">🛒 EXPRESS FAENA</h1>
-        <p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto mt-2 font-bold uppercase tracking-widest">Entrega Mañana 08:00 AM</p>
+        <div id="header-messages" class="text-center mt-2">
+             <p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto font-bold uppercase tracking-widest">Entrega Mañana 08:00 AM</p>
+        </div>
     </header>
 
     <main id="catalogo" class="p-4 grid grid-cols-2 gap-4">
@@ -57,7 +87,6 @@
                 <button onclick="hideCart()" class="text-2xl font-bold">&times;</button>
             </div>
             <div id="cart-items" class="p-4 space-y-3 overflow-y-auto">
-                <!-- Cart items will be injected here -->
             </div>
             <div class="p-4 border-t">
                  <h3 class="text-xs font-black text-blue-600 mb-2 uppercase tracking-widest">Pedido Especial</h3>
@@ -71,6 +100,12 @@
         </div>
     </div>
 
+    <!-- Image Viewer Modal -->
+    <div id="image-modal" onclick="hideImageModal()" class="hidden fixed inset-0 bg-black bg-opacity-75 z-[60] flex items-center justify-center p-4 cursor-pointer">
+        <div class="relative">
+            <img id="modal-image" src="" alt="Vista ampliada del producto" class="max-w-[90vw] max-h-[80vh] rounded-xl shadow-lg">
+        </div>
+    </div>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md p-5 border-t border-gray-100 z-50">
         <div class="flex justify-between items-center max-w-md mx-auto">
@@ -85,5 +120,19 @@
     </nav>
 
     <script type="module" src="app.js"></script>
+    <script>
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

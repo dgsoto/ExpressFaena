@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Mensajes | Express Faena</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .toggle-checkbox:checked { background-color: #22c55e; }
+        .toggle-checkbox:checked + .toggle-label .toggle-ball { transform: translateX(100%); }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
+        <h1 class="text-2xl font-black text-white text-center">📣 ADMIN DE MENSAJES</h1>
+    </header>
+
+    <main class="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
+
+        <!-- Formulario para Agregar/Editar Mensaje -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold mb-4" id="form-title">Agregar Nuevo Mensaje</h2>
+            <form id="message-form" class="space-y-4">
+                <input type="hidden" id="message-id">
+                <div>
+                    <label for="message-text" class="block text-sm font-medium text-gray-700">Texto del Mensaje</label>
+                    <input type="text" id="message-text" class="mt-1 w-full p-3 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="Ej: ¡Oferta especial en bebidas!" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">Estado (Activo / Inactivo)</span>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" id="message-active" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                        <label for="message-active" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">Guardar Mensaje</button>
+                    <button type="button" id="cancel-edit" onclick="window.resetForm()" class="hidden w-full bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Mensajes -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Mensajes Guardados</h2>
+            <div id="messages-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Los mensajes se cargarán aquí -->
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="mensajes.js"></script>
+</body>
+</html>
