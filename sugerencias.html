@@ -4,36 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Express Faena | Sugerencias</title>
+    <title>Sugerencias | Express Faena</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
-<body class="bg-gray-100 pb-32">
+<body class="bg-gray-100">
 
-    <div id="notification-banner" class="hidden bg-green-500 text-white p-3 fixed top-0 w-full z-50 flex items-center justify-center gap-2">
-        <i class="fas fa-check-circle"></i>
-        <span>¡Sugerencia enviada con éxito!</span>
-    </div>
-
-    <header class="bg-[#facc15] p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
-        <h1 class="text-2xl font-black text-black text-center">📊 Sugerencias</h1>
+    <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
+        <h1 class="text-2xl font-black text-white text-center">💡 SUGERENCIAS DE CLIENTES</h1>
     </header>
 
-    <section class="p-4">
-        <div class="bg-white p-4 rounded-xl shadow-sm">
-            <h3 class="text-sm font-bold text-gray-800 mb-2">¿Qué producto te gustaría ver en la tienda?</h3>
-            <div class="flex gap-2">
-                <input type="text" id="input-sugerencia" class="flex-1 bg-gray-100 text-black p-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="Ej: Bebida energética, galletas...">
-                <button onclick="enviarSugerencia()" class="bg-black text-white px-5 rounded-lg font-bold active:scale-95 transition-transform"><i class="fas fa-paper-plane"></i></button>
+    <main class="p-4 md:p-8 max-w-4xl mx-auto">
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Listado de Sugerencias</h2>
+            <p class="text-sm text-gray-600 mb-4">Aquí puedes ver las sugerencias de tus clientes, agrupadas por popularidad. Decide si quieres agregarlas como un nuevo producto o eliminarlas de la lista.</p>
+            <div id="sugerencias-lista" class="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
+                <!-- Las sugerencias se cargarán aquí -->
             </div>
         </div>
-    </section>
-
-    <main id="sugerencias-lista" class="p-4 space-y-4">
-        <!-- Las sugerencias se cargarán aquí -->
     </main>
 
     <script type="module" src="sugerencias.js"></script>

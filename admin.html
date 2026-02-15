@@ -1,57 +1,100 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Express Faena</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 font-sans">
 
     <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
-        <h1 class="text-2xl font-black text-white text-center">🏪 ADMIN EXPRESS FAENA</h1>
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-white text-center">⚙️ PANEL DE ADMINISTRACIÓN</h1>
+            <a href="control_total.html" class="text-sm text-white hover:text-yellow-400 flex items-center gap-2">
+                <i class="fas fa-tachometer-alt"></i> Volver al Control Total
+            </a>
+        </div>
     </header>
 
-    <main class="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
+    <main class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
 
-        <!-- Formulario para Agregar/Editar Producto -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 class="text-xl font-bold mb-4">Agregar/Editar Producto</h2>
+        <!-- Columna del Formulario -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm h-fit lg:sticky top-28">
+            <h2 id="form-title" class="text-xl font-bold mb-4">Agregar Nuevo Producto</h2>
             <form id="product-form" class="space-y-4">
                 <input type="hidden" id="product-id">
+                
                 <div>
                     <label for="product-name" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
-                    <input type="text" id="product-name" class="mt-1 w-full p-3 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="Ej: Coca-Cola 1L" required>
+                    <input type="text" id="product-name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="product-price" class="block text-sm font-medium text-gray-700">Precio</label>
+                        <input type="number" id="product-price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    </div>
+                    <div>
+                        <label for="product-stock" class="block text-sm font-medium text-gray-700">Stock Inicial</label>
+                        <input type="number" id="product-stock" min="0" placeholder="Ej: 50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    </div>
+                </div>
+
                 <div>
-                    <label for="product-price" class="block text-sm font-medium text-gray-700">Precio del Producto</label>
-                    <input type="number" id="product-price" class="mt-1 w-full p-3 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="Ej: 3000" required>
+                    <label for="product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                    <select id="product-category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <option>Combos</option>
+                        <option>Bebidas</option>
+                        <option>Snacks</option>
+                        <option>Cigarros</option>
+                        <option>Energéticas</option>
+                        <option>Otros</option>
+                    </select>
                 </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                     <div>
+                        <label for="product-discount" class="block text-sm font-medium text-gray-700">Descuento % (Opcional)</label>
+                        <input type="number" id="product-discount" placeholder="Ej: 15" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="product-stars" class="block text-sm font-medium text-gray-700">Estrellas (1-5, Opcional)</label>
+                        <input type="number" id="product-stars" max="5" min="1" placeholder="Ej: 5" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+
                 <div>
-                    <label for="product-video" class="block text-sm font-medium text-gray-700">URL del Video (Opcional)</label>
-                    <input type="text" id="product-video" class="mt-1 w-full p-3 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="https://ejemplo.com/video.mp4">
+                    <label for="product-tags" class="block text-sm font-medium text-gray-700">Etiquetas (separadas por coma)</label>
+                    <input type="text" id="product-tags" placeholder="Ej: OFERTA, NUEVO, MÁS VENDIDO" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
+
+                 <div>
+                    <label for="product-video" class="block text-sm font-medium text-gray-700">URL Video (Opcional)</label>
+                    <input type="url" id="product-video" placeholder="https://..." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
                 <div>
-                    <label for="product-images" class="block text-sm font-medium text-gray-700">URLs de Imágenes (una por línea, máx. 15)</label>
-                    <textarea id="product-images" rows="8" class="mt-1 w-full p-3 bg-gray-50 rounded-lg outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="https://ejemplo.com/imagen1.jpg\nhttps://ejemplo.com/imagen2.jpg\n..."></textarea>
+                    <label for="product-images" class="block text-sm font-medium text-gray-700">URLs de Imágenes (una por línea)</label>
+                    <textarea id="product-images" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                 </div>
-                <div class="flex gap-2 pt-2">
-                    <button type="submit" class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">Guardar Producto</button>
-                    <button type="button" id="cancel-edit" onclick="window.resetForm()" class="hidden w-full bg-gray-200 py-3 rounded-lg font-bold">Cancelar</button>
+                
+                <div class="flex gap-2">
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Producto</button>
+                    <button type="button" id="cancel-edit" class="hidden w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar Edición</button>
                 </div>
             </form>
         </div>
 
-        <!-- Lista de Productos -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 class="text-xl font-bold mb-4">Productos Existentes</h2>
-            <div id="products-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+        <!-- Columna de la Lista de Productos -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Lista de Productos</h2>
+            <div id="products-list" class="space-y-3 max-h-[80vh] overflow-y-auto pr-2">
                 <!-- Los productos se cargarán aquí -->
             </div>
         </div>
-
     </main>
 
     <script type="module" src="admin.js"></script>

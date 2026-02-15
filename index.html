@@ -6,103 +6,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Express Faena | Suministros Minería</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Theme Color for browsers -->
-    <meta name="theme-color" content="#facc15">
-
-    <!-- iOS-specific tags for PWA -->
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Express Faena">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-
     <meta name="description" content="Tienda de suministros express para faenas mineras. Cigarros, snacks y pedidos personalizados.">
-    <meta name="keywords" content="mineria, faena, chile, snacks, cuenta rut, despacho campamento">
-    <meta property="og:title" content="Express Faena - Pedidos por WhatsApp">
-    <meta property="og:description" content="Haz tu pedido hoy y recibe mañana en el campamento.">
-    <meta property="og:image" content="https://tu-usuario.github.io/tienda-faena/assets/banner.jpg">
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .fade-out {
-            animation: fadeOut 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(10px); }
-        }
-        /* Carousel styles */
-        .carousel-item {
-            display: none;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .carousel-item.active {
-            display: block;
-        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .carousel-item { display: none; }
+        .carousel-item.active { display: block; }
     </style>
 </head>
-<body class="bg-gray-100 pb-32">
+<body class="bg-gray-900 text-white pb-32">
 
-    <header class="bg-[#facc15] p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
-        <h1 class="text-2xl font-black text-black text-center">🛒 EXPRESS FAENA</h1>
-        <div id="header-messages" class="text-center mt-2">
-             <p class="text-[10px] bg-black text-white px-2 py-0.5 rounded-full w-max mx-auto font-bold uppercase tracking-widest">Entrega Mañana 08:00 AM</p>
-        </div>
+    <header class="bg-black p-4 sticky top-0 z-50 shadow-lg">
+        <h1 class="text-xl font-black text-white text-center uppercase tracking-widest">🛒 Express Faena</h1>
+        <div id="header-messages" class="text-center mt-2 text-xs font-bold h-4"></div>
     </header>
 
-    <main id="catalogo" class="p-4 grid grid-cols-2 gap-4">
+    <main id="catalogo-container" class="p-4 space-y-8">
+        <!-- Product categories will be dynamically injected here -->
     </main>
 
     <section class="p-4 space-y-4">
-        <div class="bg-black p-4 rounded-xl shadow-sm">
-            <h3 class="text-xs font-black text-[#facc15] mb-2 uppercase tracking-widest">Sugerencias</h3>
+        <div class="bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 class="text-sm font-black text-[#facc15] mb-2 uppercase tracking-widest">¿Algo que no encuentras?</h3>
             <div class="flex gap-2">
-                <input type="text" id="input-sugerencia" class="flex-1 bg-gray-800 text-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="¿Qué quieres que traigamos?">
+                <input type="text" id="input-sugerencia" class="flex-1 bg-gray-700 text-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#facc15]" placeholder="¡Pídelo aquí y lo traemos!">
                 <button onclick="enviarSugerencia()" class="bg-[#facc15] text-black px-4 rounded-lg font-bold active:scale-95 transition-transform"><i class="fas fa-paper-plane"></i></button>
             </div>
             <div id="sugerencia-notification" class="hidden text-green-400 text-sm font-bold mt-3 flex items-center gap-2">
                 <i class="fas fa-check-circle"></i>
-                <span>¡Gracias por tu sugerencia!</span>
+                <span>¡Gracias! Lo tendremos en cuenta.</span>
             </div>
         </div>
     </section>
 
     <!-- Cart Modal -->
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
-            <div class="p-4 border-b flex justify-between items-center">
-                <h2 class="text-xl font-bold">Tu Pedido</h2>
-                <button onclick="hideCart()" class="text-2xl font-bold">&times;</button>
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Finalizar Pedido</h2>
+                <button onclick="hideCart()" class="text-2xl text-white font-bold">&times;</button>
             </div>
-            <div id="cart-items" class="p-4 space-y-3 overflow-y-auto flex-1">
+    
+            <!-- Items List (Scrollable part 1) -->
+            <div id="cart-items" class="p-4 space-y-3 overflow-y-auto"></div>
+    
+            <!-- Checkout Form (Scrollable part 2) -->
+            <div class="p-4 space-y-4 overflow-y-auto flex-1">
+                <h3 class="text-sm font-black text-[#facc15] uppercase tracking-widest">Tus Datos</h3>
+                
+                <div>
+                    <label for="checkout-name" class="text-sm font-bold text-gray-300">Nombre o Alias</label>
+                    <input type="text" id="checkout-name" class="mt-1 w-full bg-gray-700 text-white p-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#facc15]" placeholder="Para saber a quién entregar" required>
+                </div>
+
+                <div>
+                    <label for="checkout-phone" class="text-sm font-bold text-gray-300">Teléfono (WhatsApp)</label>
+                    <input type="tel" id="checkout-phone" class="mt-1 w-full bg-gray-700 text-white p-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#facc15]" placeholder="+569..." pattern="[+0-9]{11,12}" title="Debe ser un número chileno, ej: +56912345678" required>
+                </div>
+    
+                <div>
+                    <label class="text-sm font-bold text-gray-300">¿Dónde entregamos?</label>
+                    <div id="delivery-options" class="mt-2 space-y-2">
+                        <label class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
+                            <input type="radio" name="delivery" value="faena" class="accent-[#facc15]" checked>
+                            <span><i class="fas fa-hard-hat mr-2"></i>En Faena (Sin costo)</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
+                            <input type="radio" name="delivery" value="direccion" class="accent-[#facc15]">
+                            <span><i class="fas fa-map-marker-alt mr-2"></i>Otra Dirección (con costo)</span>
+                        </label>
+                    </div>
+                    <input type="text" id="delivery-address" class="hidden mt-2 w-full bg-gray-700 text-white p-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#facc15]" placeholder="Ingresa la dirección y n°">
+                </div>
+    
+                <div>
+                    <label class="text-sm font-bold text-gray-300">Forma de Pago</label>
+                    <div id="payment-options" class="mt-2 space-y-2">
+                         <label class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
+                            <input type="radio" name="payment" value="efectivo" class="accent-[#facc15]" checked>
+                            <span><i class="fas fa-money-bill-wave mr-2"></i>Efectivo</span>
+                        </label>
+                         <label class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
+                            <input type="radio" name="payment" value="transferencia" class="accent-[#facc15]">
+                            <span><i class="fas fa-university mr-2"></i>Transferencia</span>
+                        </label>
+                         <label class="flex items-center gap-3 bg-gray-700 p-3 rounded-lg">
+                            <input type="radio" name="payment" value="mercadopago" class="accent-[#facc15]">
+                            <span><i class="fas fa-handshake mr-2"></i>Link Mercado Pago</span>
+                        </label>
+                    </div>
+                    <div id="payment-details" class="hidden mt-2 text-xs bg-gray-900 p-2 rounded"></div>
+                </div>
+    
+                <div>
+                    <label for="checkout-notes" class="text-sm font-bold text-gray-300">Observaciones</label>
+                     <textarea id="checkout-notes" class="mt-1 w-full bg-gray-700 text-white p-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#facc15]" placeholder="Ej: Cigarros Marlboro light, llegar a la garita..."></textarea>
+                </div>
             </div>
-            <div class="p-4 border-t">
-                 <h3 class="text-xs font-black text-blue-600 mb-2 uppercase tracking-widest">Pedido Especial</h3>
-                 <textarea id="pedido-especial" class="w-full bg-gray-50 p-3 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-600" placeholder="¿Falta algo? (Ej: Cerveza, cargador, etc.)"></textarea>
-            </div>
-            <div class="p-4 bg-gray-50 rounded-b-2xl">
-                 <button onclick="enviarWhatsApp()" class="bg-[#25D366] text-white w-full py-4 rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all">
-                    <i class="fab fa-whatsapp text-xl"></i> PEDIR POR WHATSAPP
+            
+            <!-- Footer with Summary and Button -->
+            <div class="p-4 bg-gray-900 rounded-b-2xl border-t border-gray-700">
+                <div class="space-y-1 text-sm mb-4">
+                     <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Subtotal:</span>
+                        <span id="summary-subtotal" class="font-bold text-white">$0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Delivery:</span>
+                        <span id="summary-delivery" class="font-bold text-white">$0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="font-bold text-white">TOTAL:</span>
+                        <span id="summary-total" class="font-black text-green-400">$0</span>
+                    </div>
+                </div>
+    
+                 <button onclick="enviarWhatsApp()" class="bg-[#25D366] text-black w-full py-4 rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i class="fab fa-whatsapp text-xl"></i> COMPLETAR PEDIDO
                 </button>
             </div>
         </div>
@@ -110,28 +143,24 @@
 
     <!-- Product Detail Modal -->
     <div id="product-detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative">
-            <button onclick="hideProductDetail()" class="absolute top-2 right-2 text-2xl font-bold z-10">&times;</button>
-            <div id="media-carousel" class="relative w-full bg-black">
-                <!-- Media items will be injected here -->
-            </div>
-            <div class="flex justify-center p-2 space-x-2" id="carousel-indicators">
-                <!-- Indicator dots will be injected here -->
-            </div>
+        <div class="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col relative">
+            <button onclick="hideProductDetail()" class="absolute top-2 right-3 text-white text-3xl font-bold z-20">&times;</button>
+            <div id="media-carousel" class="relative w-full bg-black rounded-t-2xl aspect-square"></div>
+            <div class="flex justify-center py-2 space-x-2" id="carousel-indicators"></div>
             <div class="p-4">
-                <h2 id="detail-product-name" class="text-xl font-bold"></h2>
-                <p id="detail-product-price" class="text-lg font-black"></p>
+                <h2 id="detail-product-name" class="text-xl font-bold text-white"></h2>
+                <p id="detail-product-price" class="text-lg font-black text-[#facc15]"></p>
             </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md p-5 border-t border-gray-100 z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md p-4 border-t border-gray-700 z-40">
         <div class="flex justify-between items-center max-w-md mx-auto">
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase leading-none">Total Pedido</p>
-                <p id="total-carrito" class="text-2xl font-black text-green-600 leading-none">$0</p>
+                <p class="text-xs font-bold text-gray-400 uppercase">Total Pedido</p>
+                <p id="total-carrito" class="text-2xl font-black text-green-400">$0</p>
             </div>
-            <button onclick="showCart()" class="bg-black text-white px-8 py-3 rounded-2xl font-black shadow-lg flex items-center gap-2 active:scale-95 transition-all">
+            <button onclick="showCart()" class="bg-white text-black px-8 py-3 rounded-2xl font-black shadow-lg flex items-center gap-2 active:scale-95 transition-all">
                 <i class="fas fa-shopping-cart"></i> VER PEDIDO
             </button>
         </div>
@@ -139,16 +168,9 @@
 
     <script type="module" src="app.js"></script>
     <script>
-        // --- PWA Service Worker Registration ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                navigator.serviceWorker.register('service-worker.js');
             });
         }
     </script>

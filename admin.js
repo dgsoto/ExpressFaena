@@ -21,43 +21,55 @@ const db = getFirestore(app);
 const productForm = document.getElementById('product-form');
 const productIdInput = document.getElementById('product-id');
 const productNameInput = document.getElementById('product-name');
+const productCategoryInput = document.getElementById('product-category');
 const productPriceInput = document.getElementById('product-price');
+const productStockInput = document.getElementById('product-stock');
+const productDiscountInput = document.getElementById('product-discount');
+const productTagsInput = document.getElementById('product-tags');
+const productStarsInput = document.getElementById('product-stars');
 const productVideoInput = document.getElementById('product-video');
 const productImagesTextarea = document.getElementById('product-images');
 const productsList = document.getElementById('products-list');
 const cancelEditBtn = document.getElementById('cancel-edit');
+const formTitle = document.getElementById('form-title');
 
 // --- LOAD AND DISPLAY PRODUCTS (REAL-TIME) ---
-// We query the products and order them by name for consistent display.
 const q = query(collection(db, "productos"), orderBy("nombre"));
 onSnapshot(q, (querySnapshot) => {
     productsList.innerHTML = "";
     if (querySnapshot.empty) {
-        productsList.innerHTML = `<p class="text-center text-gray-500">No hay productos para mostrar.</p>`;
+        productsList.innerHTML = `<p class="text-center text-gray-500">No hay productos.</p>`;
         return;
     }
     querySnapshot.forEach((doc) => {
         const product = doc.data();
         const productId = doc.id;
+        const thumbnailUrl = (product.images && product.images.length > 0) ? product.images[0] : 'https://via.placeholder.com/150';
 
-        // Use the first image from the 'images' array for the thumbnail.
-        // If there are no images, show a placeholder.
-        const thumbnailUrl = (product.images && product.images.length > 0)
-            ? product.images[0]
-            : 'https://via.placeholder.com/150?text=No+Image';
+        // --- Lógica de Color de Stock ---
+        const stock = product.stock !== undefined ? product.stock : -1; // Default to -1 if undefined
+        let stockStatus;
+        if (stock > 10) {
+            stockStatus = { text: `${stock} Unidades`, color: 'text-green-600', bg: 'bg-green-100' };
+        } else if (stock > 0 && stock <= 10) {
+            stockStatus = { text: `${stock} Unidades`, color: 'text-orange-600', bg: 'bg-orange-100' };
+        } else {
+            stockStatus = { text: 'Agotado', color: 'text-red-600', bg: 'bg-red-100' };
+        }
 
         productsList.innerHTML += `
-            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                 <div class="flex items-center gap-4">
                     <img src="${thumbnailUrl}" alt="${product.nombre}" class="w-12 h-12 object-cover rounded-md">
                     <div>
                         <p class="font-bold text-gray-800">${product.nombre}</p>
-                        <p class="text-sm text-gray-600">$${product.precio.toLocaleString('es-CL')}</p>
+                        <p class="text-sm text-gray-600">$${(product.precio || 0).toLocaleString('es-CL')} - ${product.categoria || 'Sin Cat.'}</p>
+                        <p class="text-xs font-bold ${stockStatus.color} ${stockStatus.bg} px-2 py-0.5 rounded-full inline-block mt-1">Stock: ${stockStatus.text}</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="window.editProduct('${productId}')" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-pencil-alt"></i></button>
-                    <button onclick="window.deleteProduct('${productId}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-trash"></i></button>
+                    <button onclick="window.editProduct('${productId}')" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-blue-600 transition-colors"><i class="fas fa-pencil-alt"></i> Editar</button>
+                    <button onclick="window.deleteProduct('${productId}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i> Eliminar</button>
                 </div>
             </div>
         `;
@@ -69,103 +81,101 @@ productForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const id = productIdInput.value;
-    const name = productNameInput.value.trim();
-    const price = parseFloat(productPriceInput.value);
-    const video = productVideoInput.value.trim();
-
-    // Process the textarea for image URLs:
-    // 1. Split the string into an array by newlines.
-    // 2. Trim whitespace from each URL.
-    // 3. Filter out any empty lines.
     const images = productImagesTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+    const tags = productTagsInput.value.split(',').map(tag => tag.trim().toUpperCase()).filter(tag => tag);
 
-    if (!name || isNaN(price) || price <= 0) {
-        alert("Por favor, completa el nombre y el precio correctamente.");
-        return;
-    }
-    if (images.length > 15) {
-        alert("Puedes agregar un máximo de 15 imágenes.");
-        return;
-    }
-
-    // This is the new data structure for our product document.
-    const productData = { 
-        nombre: name, 
-        precio: price, 
-        video: video, // Can be an empty string if no video is provided.
-        images: images  // An array of image URLs.
+    const productData = {
+        nombre: productNameInput.value.trim(),
+        categoria: productCategoryInput.value.trim(),
+        precio: parseFloat(productPriceInput.value),
+        stock: parseInt(productStockInput.value),
+        descuento: parseInt(productDiscountInput.value) || 0,
+        tags: tags, 
+        estrellas: parseInt(productStarsInput.value) || 5,
+        video: productVideoInput.value.trim(),
+        images: images,
     };
+
+    // Validación
+    if (!productData.nombre || !productData.categoria || isNaN(productData.precio) || isNaN(productData.stock) || productData.stock < 0) {
+        alert("Por favor, completa Nombre, Categoría, Precio y un Stock válido (0 o más).");
+        return;
+    }
 
     try {
         if (id) {
-            // If an ID exists, we are updating an existing product.
             await updateDoc(doc(db, "productos", id), productData);
             alert("¡Producto actualizado con éxito!");
         } else {
-            // Otherwise, we are adding a new product.
             await addDoc(collection(db, "productos"), productData);
             alert("¡Producto agregado con éxito!");
         }
         resetForm();
     } catch (error) {
         console.error("Error guardando el producto: ", error);
-        alert("Hubo un error al guardar el producto.");
+        alert("Hubo un error al guardar.");
     }
 });
 
 // --- EDIT FUNCTION ---
-// When the edit button is clicked, we fetch the latest product data from Firestore.
 window.editProduct = async (id) => {
     try {
-        const docRef = doc(db, "productos", id);
-        const docSnap = await getDoc(docRef);
-
+        const docSnap = await getDoc(doc(db, "productos", id));
         if (docSnap.exists()) {
-            const product = docSnap.data();
-            
-            // Populate the form with the product's data.
+            const p = docSnap.data();
             productIdInput.value = id;
-            productNameInput.value = product.nombre;
-            productPriceInput.value = product.precio;
-            productVideoInput.value = product.video || '';
-            // Join the array of image URLs into a newline-separated string for the textarea.
-            productImagesTextarea.value = (product.images || []).join('\n');
+            productNameInput.value = p.nombre;
+            productCategoryInput.value = p.categoria;
+            productPriceInput.value = p.precio;
+            productStockInput.value = p.stock;
+            productDiscountInput.value = p.descuento || '';
+            productTagsInput.value = (p.tags || []).join(', ');
+            productStarsInput.value = p.estrellas || '';
+            productVideoInput.value = p.video || '';
+            productImagesTextarea.value = (p.images || []).join('\n');
 
-            // Update UI to show that we are in edit mode.
+            formTitle.innerText = "Editando Producto";
             productForm.querySelector('button[type="submit"]').innerText = "Actualizar Producto";
             cancelEditBtn.classList.remove('hidden');
-            window.scrollTo(0, 0); // Scroll to the top to see the form.
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            alert("El producto que intentas editar no fue encontrado.");
+            alert("Producto no encontrado.");
         }
     } catch (error) {
-        console.error("Error al cargar datos para editar: ", error);
-        alert("Error al cargar los datos del producto.");
+        console.error("Error al cargar producto: ", error);
     }
 }
 
 // --- DELETE FUNCTION ---
 window.deleteProduct = async (id) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+    if (confirm("¿Seguro que quieres eliminar este producto? Esto no repondrá el stock en ventas pasadas.")) {
         try {
             await deleteDoc(doc(db, "productos", id));
             alert("Producto eliminado.");
+            resetForm();
         } catch (error) {
-            console.error("Error eliminando el producto: ", error);
-            alert("No se pudo eliminar el producto.");
+            console.error("Error eliminando: ", error);
         }
     }
 }
 
 // --- RESET FORM FUNCTION ---
 window.resetForm = () => {
-    productForm.reset(); // This clears all inputs within the form.
-    productIdInput.value = ''; // Explicitly clear the hidden ID input.
-
-    // Reset UI to be in "add new" mode.
+    productForm.reset();
+    productIdInput.value = '';
+    formTitle.innerText = "Agregar Nuevo Producto";
     productForm.querySelector('button[type="submit"]').innerText = "Guardar Producto";
     cancelEditBtn.classList.add('hidden');
 }
 
-// Add a listener to the cancel button.
 cancelEditBtn.addEventListener('click', window.resetForm);
+
+// Check for suggestion-to-product on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const newProductName = localStorage.getItem('newProductNameFromSuggestion');
+    if (newProductName) {
+        productNameInput.value = newProductName.replace(/&quot;/g, '"');
+        localStorage.removeItem('newProductNameFromSuggestion');
+        productNameInput.focus();
+    }
+});

@@ -1,8 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// --- FIREBASE CONFIG ---
 const firebaseConfig = {
     apiKey: "AIzaSyAP2RBfMX8qB1FcBbjBZoTvAnxQxY5_IYM",
     authDomain: "express-faena-tienda.firebaseapp.com",
@@ -13,89 +12,73 @@ const firebaseConfig = {
     measurementId: "G-KH92E5K2TS"
 };
 
-// --- INITIALIZE APP ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- DOM ELEMENTS ---
 const sugerenciasLista = document.getElementById('sugerencias-lista');
-const sugerenciaInput = document.getElementById('input-sugerencia');
-const notificationBanner = document.getElementById('notification-banner');
 
-// --- REALTIME SUGGESTIONS LISTENER ---
-function listenForSugerencias() {
-    const q = query(collection(db, "sugerencias"), orderBy("date", "desc"));
+const q = query(collection(db, "sugerencias"));
 
-    onSnapshot(q, (querySnapshot) => {
-        const sugerencias = {};
-        querySnapshot.forEach((doc) => {
-            const item = doc.data().item.trim();
-            if (item) { // Ensure item is not empty
-                 sugerencias[item] = (sugerencias[item] || 0) + 1;
-            }
-        });
-        renderSugerencias(sugerencias);
-    }, (error) => {
-        sugerenciasLista.innerHTML = "<p class='text-center text-red-500'>Error al cargar sugerencias.</p>";
-        console.error("Error listening for suggestions: ", error);
+onSnapshot(q, (snapshot) => {
+    const suggestions = {};
+    snapshot.docs.forEach(doc => {
+        const item = doc.data().item.trim().toLowerCase();
+        if (!suggestions[item]) {
+            suggestions[item] = { count: 0, ids: [] };
+        }
+        suggestions[item].count++;
+        suggestions[item].ids.push(doc.id);
     });
-}
 
-// --- RENDER SUGGESTIONS ---
-function renderSugerencias(sugerencias) {
-    if (!sugerenciasLista) return;
+    const sortedSuggestions = Object.entries(suggestions).sort(([, a], [, b]) => b.count - a.count);
+
     sugerenciasLista.innerHTML = "";
-
-    // Sort suggestions by count descending
-    const sortedSugerencias = Object.entries(sugerencias).sort(([,a],[,b]) => b-a);
-
-    if (sortedSugerencias.length === 0) {
-        sugerenciasLista.innerHTML = "<p class='text-center text-gray-500'>Aún no hay sugerencias.</p>";
+    if (sortedSuggestions.length === 0) {
+        sugerenciasLista.innerHTML = `<p class="text-center text-gray-500">No hay sugerencias por el momento.</p>`;
         return;
     }
 
-    for (const [item, count] of sortedSugerencias) {
+    sortedSuggestions.forEach(([item, data]) => {
+        const capitalItem = item.charAt(0).toUpperCase() + item.slice(1);
+        // --- FIX --- 
+        // Properly escape both single and double quotes for safe use in HTML onclick attributes.
+        const escapedItem = capitalItem.replace(/"/g, '&quot;').replace(/'/g, "\'");
+
         sugerenciasLista.innerHTML += `
-            <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center animate-fade-in">
-                <span class="font-semibold capitalize">${item}</span>
-                <span class="bg-gray-200 text-gray-800 text-sm font-bold px-3 py-1 rounded-full">Votos: ${count}</span>
+            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex items-center gap-4">
+                    <span class="font-bold text-lg text-gray-700">${data.count}x</span>
+                    <p class="font-semibold text-gray-800">${capitalItem}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.convertToProduct('${escapedItem}')" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm font-semibold flex items-center gap-1.5 hover:bg-green-600 active:scale-95 transition-all" title="Convertir a Producto">
+                        <i class="fas fa-plus"></i> Producto
+                    </button>
+                    <button onclick="window.deleteSuggestion('${data.ids.join(',')}', '${escapedItem}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold flex items-center gap-1.5 hover:bg-red-600 active:scale-95 transition-all" title="Eliminar Sugerencia">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
             </div>
         `;
-    }
-}
+    });
+});
 
-// --- SEND SUGGESTION ---
-window.enviarSugerencia = async () => {
-    const val = sugerenciaInput.value.trim();
-    if (!val) return;
-
-    try {
-        await addDoc(collection(db, "sugerencias"), { 
-            item: val, 
-            date: serverTimestamp() 
-        });
-        
-        sugerenciaInput.value = "";
-        showNotification();
-
-    } catch (e) {
-        alert("No se pudo enviar la sugerencia. Intenta de nuevo.");
-        console.error("Error adding document: ", e);
-    }
+window.convertToProduct = (itemName) => {
+    localStorage.setItem('newProductNameFromSuggestion', itemName);
+    window.location.href = 'admin.html';
 };
 
-// --- NOTIFICATION ---
-function showNotification() {
-    notificationBanner.classList.remove('hidden');
-    notificationBanner.classList.add('animate-fade-in');
+window.deleteSuggestion = async (idString, suggestionText) => {
+    const ids = idString.split(',');
     
-    setTimeout(() => {
-        notificationBanner.classList.add('hidden');
-        notificationBanner.classList.remove('animate-fade-in');
-    }, 3000);
-}
-
-// --- INITIAL LOAD ---
-document.addEventListener('DOMContentLoaded', () => {
-    listenForSugerencias();
-});
+    if (confirm(`¿Estás seguro de que quieres eliminar TODAS las sugerencias de \"${suggestionText}\"? (${ids.length} en total)`)) {
+        try {
+            const deletePromises = ids.map(id => deleteDoc(doc(db, "sugerencias", id)));
+            await Promise.all(deletePromises);
+            // The UI will now update automatically via the onSnapshot listener.
+        } catch (error) {
+            console.error("Error al eliminar las sugerencias: ", error);
+            alert("Hubo un error al eliminar las sugerencias. Revisa la consola para más detalles.");
+        }
+    }
+};
