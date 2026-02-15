@@ -1,4 +1,5 @@
 
+import "./auth_guard.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -61,11 +62,11 @@ window.updateOrderStatus = async (orderId, newStatus) => {
                 }
                 // Marcar el pedido para no reponer el stock de nuevo
                 transaction.update(orderRef, { status: newStatus, stockRepuesto: true });
-            
-            // CASO 2: Un pedido CANCELADO se está reactivando
+
+                // CASO 2: Un pedido CANCELADO se está reactivando
             } else if (oldStatus === 'Cancelado' && newStatus !== 'Cancelado' && orderData.stockRepuesto) {
-                 // Volver a descontar el stock de cada item
-                 for (const item of orderData.items) {
+                // Volver a descontar el stock de cada item
+                for (const item of orderData.items) {
                     const productRef = doc(db, "productos", item.id);
                     const productSnap = await transaction.get(productRef);
                     if (productSnap.exists()) {

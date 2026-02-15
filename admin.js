@@ -1,4 +1,5 @@
 
+import "./auth_guard.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -90,7 +91,7 @@ productForm.addEventListener('submit', async (e) => {
         precio: parseFloat(productPriceInput.value),
         stock: parseInt(productStockInput.value),
         descuento: parseInt(productDiscountInput.value) || 0,
-        tags: tags, 
+        tags: tags,
         estrellas: parseInt(productStarsInput.value) || 5,
         video: productVideoInput.value.trim(),
         images: images,

@@ -1,4 +1,5 @@
 
+import "./auth_guard.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot, doc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -70,7 +71,7 @@ window.convertToProduct = (itemName) => {
 
 window.deleteSuggestion = async (idString, suggestionText) => {
     const ids = idString.split(',');
-    
+
     if (confirm(`¿Estás seguro de que quieres eliminar TODAS las sugerencias de \"${suggestionText}\"? (${ids.length} en total)`)) {
         try {
             const deletePromises = ids.map(id => deleteDoc(doc(db, "sugerencias", id)));

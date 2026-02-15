@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import "./auth_guard.js";
 import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- FIREBASE CONFIG (debe ser la misma que en tus otros archivos) ---
@@ -44,9 +44,9 @@ onSnapshot(ventasQuery, (snapshot) => {
     // 2. Process Product Ranking
     const productStats = salesData.reduce((acc, sale) => {
         if (!acc[sale.nombre]) {
-            acc[sale.nombre] = { 
-                quantity: 0, 
-                revenue: 0 
+            acc[sale.nombre] = {
+                quantity: 0,
+                revenue: 0
             };
         }
         acc[sale.nombre].quantity += (sale.quantity || 0);
