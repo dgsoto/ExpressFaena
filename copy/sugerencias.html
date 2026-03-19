@@ -9,12 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 hidden">
 
     <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-black text-white text-center">💡 SUGERENCIAS DE CLIENTES</h1>
-            <a href="control_total.html" class="text-sm text-white hover:text-yellow-400 flex items-center gap-2">
+             <a href="control_total.html" class="text-sm text-white hover:text-yellow-400 flex items-center gap-2">
                 <i class="fas fa-tachometer-alt"></i> Volver al Control Total
             </a>
         </div>
@@ -27,9 +27,13 @@
             <div id="sugerencias-lista" class="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                 <!-- Las sugerencias se cargarán aquí -->
             </div>
+             <div id="loading-state" class="p-6 text-center text-gray-500">
+                <i class="fas fa-spinner fa-spin mr-2"></i>Cargando sugerencias...
+            </div>
         </div>
     </main>
 
-    <script type="module" src="sugerencias_final.js"></script>
+    <script type="module" src="auth_guard.js"></script>
+    <script type="module" src="sugerencias.js"></script>
 </body>
 </html>

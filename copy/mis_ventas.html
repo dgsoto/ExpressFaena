@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Ventas | Express Faena</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        .toggle-content { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans hidden">
+
+    <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-white text-center">📈 CENTRO DE VENDEDORES</h1>
+            <a href="control_total.html" class="text-sm text-white hover:text-yellow-400 flex items-center gap-2">
+                <i class="fas fa-tachometer-alt"></i> Volver al Control Total
+            </a>
+        </div>
+    </header>
+
+    <main class="p-4 md:p-8 max-w-7xl mx-auto">
+
+        <!-- Global Stats -->
+        <section id="global-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                <i class="fas fa-dollar-sign text-3xl text-green-500"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Ingresos (Completados)</p>
+                    <p id="stats-total-revenue" class="text-2xl font-bold">$0</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                <i class="fas fa-shopping-cart text-3xl text-blue-500"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Pedidos (No Cancelados)</p>
+                    <p id="stats-total-orders" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                <i class="fas fa-users text-3xl text-yellow-500"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Clientes Únicos</p>
+                    <p id="stats-unique-customers" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer List -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm mb-8">
+            <div class="flex justify-between items-center mb-4">
+                 <h2 class="text-xl font-bold">Lista de Clientes</h2>
+                 <div class="flex items-center gap-4">
+                    <button id="export-contacts-btn" class="hidden bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-all">
+                        <i class="fab fa-whatsapp"></i> Exportar Contactos
+                    </button>
+                    <div id="toast-notification" class="hidden bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-lg">
+                        <i class="fas fa-check-circle"></i> Estado actualizado
+                    </div>
+                </div>
+            </div>
+            <div id="customer-list-container" class="space-y-3">
+                <p class="text-center text-gray-500">Cargando datos de clientes...</p>
+            </div>
+        </section>
+        
+        <!-- Analytics Section -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold mb-4">Análisis (Ventas No Canceladas)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-semibold mb-2">Horas Pico de Compra</h3>
+                    <div id="peak-hours-chart" class="space-y-2"></div>
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-2">Productos Más Vendidos</h3>
+                    <div id="top-products-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <script type="module" src="auth_guard.js"></script>
+    <script type="module" src="mis_ventas.js"></script>
+</body>
+</html>

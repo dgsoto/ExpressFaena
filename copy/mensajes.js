@@ -1,8 +1,8 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// --- CONFIGURACIÓN DE FIREBASE ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
     apiKey: "AIzaSyAP2RBfMX8qB1FcBbjBZoTvAnxQxY5_IYM",
     authDomain: "express-faena-tienda.firebaseapp.com",
@@ -13,11 +13,11 @@ const firebaseConfig = {
     measurementId: "G-KH92E5K2TS"
 };
 
-// --- INICIALIZACIÓN DE LA APP ---
+// --- INITIALIZE APP ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- ELEMENTOS DEL DOM ---
+// --- DOM ELEMENTS ---
 const messageForm = document.getElementById('message-form');
 const messageIdInput = document.getElementById('message-id');
 const messageTextInput = document.getElementById('message-text');
@@ -26,9 +26,8 @@ const messagesList = document.getElementById('messages-list');
 const cancelEditBtn = document.getElementById('cancel-edit');
 const formTitle = document.getElementById('form-title');
 
-// --- CARGAR Y MOSTRAR MENSAJES (EN TIEMPO REAL Y ORDENADOS) ---
-const messagesQuery = query(collection(db, "mensajes"), orderBy("createdAt", "desc"));
-onSnapshot(messagesQuery, (querySnapshot) => {
+// --- LOAD AND DISPLAY MESSAGES (REAL-TIME) ---
+onSnapshot(collection(db, "mensajes"), (querySnapshot) => {
     messagesList.innerHTML = "";
     if (querySnapshot.empty) {
         messagesList.innerHTML = `<p class="text-center text-gray-500">No hay mensajes guardados.</p>`;
@@ -37,31 +36,25 @@ onSnapshot(messagesQuery, (querySnapshot) => {
     querySnapshot.forEach((doc) => {
         const message = doc.data();
         const messageId = doc.id;
-        
         const activeClass = message.active ? 'bg-green-100' : 'bg-gray-100';
         const activeText = message.active ? '<span class="font-bold text-green-600">Activo</span>' : '<span class="font-bold text-gray-500">Inactivo</span>';
 
-        const messageElement = document.createElement('div');
-        messageElement.className = `flex items-center justify-between ${activeClass} p-3 rounded-lg`;
-        messageElement.innerHTML = `
-            <p class="font-medium">${message.text}</p>
-            <div class="flex items-center gap-4">
-                ${activeText}
-                <div class="flex gap-2">
-                    <button class="edit-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="delete-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-trash"></i></button>
+        messagesList.innerHTML += `
+            <div class="flex items-center justify-between ${activeClass} p-3 rounded-lg">
+                <p class="font-medium">${message.text}</p>
+                <div class="flex items-center gap-4">
+                    ${activeText}
+                    <div class="flex gap-2">
+                        <button onclick="window.editMessage('${messageId}', '${message.text}', ${message.active})" class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-pencil-alt"></i></button>
+                        <button onclick="window.deleteMessage('${messageId}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
             </div>
         `;
-        
-        messageElement.querySelector('.edit-btn').addEventListener('click', () => editMessageHandler(messageId, message.text, message.active));
-        messageElement.querySelector('.delete-btn').addEventListener('click', () => deleteMessageHandler(messageId));
-
-        messagesList.appendChild(messageElement);
     });
 });
 
-// --- ENVÍO DEL FORMULARIO (CREAR/ACTUALIZAR) ---
+// --- FORM SUBMISSION (CREATE/UPDATE) ---
 messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -74,30 +67,27 @@ messageForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    const messageData = { text, active, createdAt: serverTimestamp() };
+
     try {
         if (id) {
-            // Actualizar un mensaje existente
-            const messageRef = doc(db, "mensajes", id);
-            await updateDoc(messageRef, { text, active });
+            // Update
+            await updateDoc(doc(db, "mensajes", id), { text, active });
             alert("¡Mensaje actualizado!");
         } else {
-            // Crear un nuevo mensaje
-            await addDoc(collection(db, "mensajes"), {
-                text: text,
-                active: active,
-                createdAt: serverTimestamp()
-            });
+            // Create
+            await addDoc(collection(db, "mensajes"), messageData);
             alert("¡Mensaje guardado!");
         }
         resetForm();
     } catch (error) {
         console.error("Error guardando el mensaje: ", error);
-        alert("Error al guardar el mensaje. Revisa la consola para más detalles.");
+        alert("Error al guardar el mensaje.");
     }
 });
 
-// --- MANEJADOR PARA EDITAR ---
-function editMessageHandler(id, text, active) {
+// --- EDIT FUNCTION ---
+window.editMessage = (id, text, active) => {
     messageIdInput.value = id;
     messageTextInput.value = text;
     messageActiveToggle.checked = active;
@@ -106,10 +96,10 @@ function editMessageHandler(id, text, active) {
     cancelEditBtn.classList.remove('hidden');
     messageForm.querySelector('button[type="submit"]').innerText = "Actualizar Mensaje";
     window.scrollTo(0, 0);
-}
+};
 
-// --- MANEJADOR PARA ELIMINAR ---
-async function deleteMessageHandler(id) {
+// --- DELETE FUNCTION ---
+window.deleteMessage = async (id) => {
     if (confirm("¿Seguro que quieres eliminar este mensaje?")) {
         try {
             await deleteDoc(doc(db, "mensajes", id));
@@ -119,16 +109,13 @@ async function deleteMessageHandler(id) {
             alert("No se pudo eliminar el mensaje.");
         }
     }
-}
+};
 
-// --- FUNCIÓN PARA RESETEAR EL FORMULARIO ---
-function resetForm() {
+// --- RESET FORM ---
+window.resetForm = () => {
     messageForm.reset();
     messageIdInput.value = '';
     formTitle.innerText = "Agregar Nuevo Mensaje";
     messageForm.querySelector('button[type="submit"]').innerText = "Guardar Mensaje";
     cancelEditBtn.classList.add('hidden');
 }
-
-// Asignar la función de reset al botón de cancelar en el scope global
-window.resetForm = resetForm;

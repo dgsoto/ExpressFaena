@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Express Faena</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-192.png" type="image/png">
+    <meta name="theme-color" content="#1a1a1a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+
+<body class="bg-gray-900 text-white">
+
+    <!-- Header -->
+    <header class="bg-gray-900 sticky top-0 z-30 py-3 px-4 shadow-md">
+        <div class="flex justify-center items-center">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <h1 class="text-xl font-black ml-2 tracking-widest">EXPRESS FAENA</h1>
+        </div>
+    </header>
+
+    <!-- Message Ticker -->
+    <div id="message-ticker-container" class="bg-gray-800 text-yellow-400 text-center py-2 px-4 text-sm font-bold overflow-hidden whitespace-nowrap">
+        <!-- Los mensajes se cargarán aquí -->
+    </div>
+
+    <!-- Contenido Principal -->
+    <main id="catalogo-container" class="p-4 pb-28">
+        <!-- Los productos se cargarán aquí -->
+    </main>
+
+    <!-- Barra Inferior Fija -->
+    <div id="bottom-bar" class="fixed bottom-0 left-0 w-full bg-gray-800 z-40 p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.3)] flex items-center justify-between">
+        <div>
+            <p class="text-xs text-gray-400">TOTAL PEDIDO</p>
+            <p id="total-pedido-display" class="text-2xl font-black text-white">$0</p>
+        </div>
+        <button id="ver-pedido-btn" class="bg-white text-black font-bold py-3 px-6 rounded-lg shadow-lg active:scale-95 transition-transform">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            VER PEDIDO
+        </button>
+    </div>
+
+    <!-- Modal de Finalizar Pedido -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-gray-800 rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col shadow-xl">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <h2 class="text-xl font-bold text-white">Finalizar Pedido</h2>
+                <button id="close-modal-btn" class="text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-grow">
+                <!-- Items del Carrito -->
+                <div id="checkout-cart-items" class="space-y-3 mb-6"></div>
+                
+                <!-- Tus Datos -->
+                <h3 class="font-bold text-lg mb-2">TUS DATOS</h3>
+                <div class="space-y-3 mb-6">
+                    <input id="checkout-name" type="text" placeholder="Nombre o Alias" class="w-full bg-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 border border-transparent focus:border-yellow-400 focus:outline-none">
+                    <input id="checkout-phone" type="tel" placeholder="Teléfono (WhatsApp)" value="+569" class="w-full bg-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 border border-transparent focus:border-yellow-400 focus:outline-none">
+                </div>
+
+                <!-- Dónde entregamos? -->
+                <h3 class="font-bold text-lg mb-2">¿Dónde entregamos?</h3>
+                <div class="space-y-3 mb-6">
+                    <label class="flex items-center bg-gray-700 p-3 rounded-lg">
+                        <input type="radio" name="delivery-option" value="faena" class="accent-yellow-400 w-5 h-5" checked>
+                        <span class="ml-3">En Faena (Sin costo)</span>
+                    </label>
+                    <label class="flex items-center bg-gray-700 p-3 rounded-lg">
+                        <input type="radio" name="delivery-option" value="otro" class="accent-yellow-400 w-5 h-5">
+                        <span class="ml-3">Otra Dirección (con costo)</span>
+                    </label>
+                </div>
+
+                <!-- Forma de Pago -->
+                <h3 class="font-bold text-lg mb-2">Forma de Pago</h3>
+                <div class="space-y-3 mb-6">
+                     <label class="flex items-center bg-gray-700 p-3 rounded-lg">
+                        <input type="radio" name="payment-method" value="Efectivo" class="accent-yellow-400 w-5 h-5" checked>
+                        <i class="fas fa-money-bill-wave text-lg ml-3 mr-2 w-6 text-center"></i>
+                        <span>Efectivo</span>
+                    </label>
+                    <label class="flex items-center bg-gray-700 p-3 rounded-lg">
+                        <input type="radio" name="payment-method" value="Transferencia" class="accent-yellow-400 w-5 h-5">
+                        <i class="fas fa-university text-lg ml-3 mr-2 w-6 text-center"></i>
+                        <span>Transferencia</span>
+                    </label>
+                    <label class="flex items-center bg-gray-700 p-3 rounded-lg">
+                        <input type="radio" name="payment-method" value="Link Mercado Pago" class="accent-yellow-400 w-5 h-5">
+                        <i class="fas fa-credit-card text-lg ml-3 mr-2 w-6 text-center"></i>
+                        <span>Link Mercado Pago</span>
+                    </label>
+                </div>
+                 <!-- Observaciones -->
+                <h3 class="font-bold text-lg mb-2">Observaciones</h3>
+                <textarea id="checkout-observations" placeholder="Ej: Cigarros Marlboro light, llegar a la garita..." class="w-full bg-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 border border-transparent focus:border-yellow-400 focus:outline-none h-24"></textarea>
+
+            </div>
+            <!-- Footer del Modal -->
+            <div class="p-4 border-t border-gray-700 space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Subtotal</span>
+                    <span id="summary-subtotal">$0</span>
+                </div>
+                 <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Delivery</span>
+                    <span id="summary-delivery">$0</span>
+                </div>
+                <div class="flex justify-between items-center font-bold text-lg">
+                    <span>TOTAL</span>
+                    <span id="summary-total" class="text-2xl font-black text-green-400">$0</span>
+                </div>
+                <button id="send-whatsapp-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 text-lg active:scale-95 transition-transform">
+                    <i class="fab fa-whatsapp"></i> COMPLETAR PEDIDO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>

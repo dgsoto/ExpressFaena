@@ -1,25 +1,113 @@
-/* Add styles here */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-body {
-    font-family: 'Inter', sans-serif;
-    -webkit-tap-highlight-color: transparent;
+html {
+    scroll-behavior: smooth;
 }
 
-#catalogo img {
-    height: 100px;
-    object-fit: contain;
-    @apply transition-transform duration-300;
+/* Estilos para la barra de scroll en navegadores Webkit */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-#catalogo div:active img {
-    transform: scale(0.9);
+::-webkit-scrollbar-track {
+    background: #1f2937; /* Color de fondo de la pista */
 }
 
-.card-prod {
-    @apply bg-white p-3 rounded-2xl shadow-sm flex flex-col justify-between border border-transparent active:border-[#facc15];
+::-webkit-scrollbar-thumb {
+    background: #4b5563; /* Color del "pulgar" de la barra */
+    border-radius: 4px;
 }
 
-textarea::placeholder, input::placeholder {
-    @apply text-gray-500;
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280; /* Color al pasar el mouse */
 }
+
+
+/* ========= NUEVOS ESTILOS PARA EL MODAL DE PRODUCTO ========= */
+
+/* Contenedor del carrusel */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Contenedor de todos los slides (imágenes/video) */
+.carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s ease-in-out;
+}
+
+/* Estilo para cada slide individual */
+.carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-slide img, .carousel-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Se asegura que toda la imagen/video sea visible */
+}
+
+/* Botones de navegación (anterior/siguiente) */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    z-index: 10;
+}
+
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+/* Puntos de navegación inferiores */
+.carousel-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.carousel-dot.active {
+    background-color: white;
+}
+

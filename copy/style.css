@@ -1,0 +1,25 @@
+/* Add styles here */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#catalogo-container img {
+    height: 100px;
+    object-fit: cover;
+    @apply transition-transform duration-300;
+}
+
+#catalogo-container > section > div > div:active img {
+    transform: scale(0.9);
+}
+
+textarea::placeholder, input::placeholder {
+    @apply text-gray-500;
+}
+
+#message-ticker-container {
+    transition: opacity 0.5s ease-in-out;
+}

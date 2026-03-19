@@ -29,6 +29,7 @@ const buttonSpinner = document.getElementById('button-spinner');
 // --- REDIRECT IF ALREADY LOGGED IN ---
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        // Si ya hay una sesión activa, redirigir directamente al panel de control.
         window.location.href = 'control_total.html';
     }
 });
@@ -39,24 +40,25 @@ loginForm.addEventListener('submit', async (e) => {
     
     const email = emailInput.value;
     const password = passwordInput.value;
-    errorMessageDiv.textContent = ''; 
+    errorMessageDiv.textContent = ''; // Limpiar errores previos
 
+    // Mostrar spinner y deshabilitar botón
     buttonText.textContent = 'Ingresando...';
     buttonSpinner.classList.remove('hidden');
     loginButton.disabled = true;
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // El onAuthStateChanged se encargará de la redirección.
+        // No es necesario hacer nada más aquí.
         console.log("Inicio de sesión exitoso para:", userCredential.user.email);
 
     } catch (error) {
-        console.error("Error de autenticación de Firebase:", error); // <-- AÑADIDO PARA DEBUGGING
-        let friendlyErrorMessage;
-        
+        let friendlyErrorMessage = 'Ocurrió un error. Inténtalo de nuevo.';
+        // Mapeo de errores de Firebase a mensajes amigables
         switch (error.code) {
             case 'auth/user-not-found':
             case 'auth/wrong-password':
-            case 'auth/invalid-credential': // Añadido para versiones más nuevas de SDK
                 friendlyErrorMessage = 'Correo o contraseña incorrectos.';
                 break;
             case 'auth/invalid-email':
@@ -65,13 +67,10 @@ loginForm.addEventListener('submit', async (e) => {
             case 'auth/too-many-requests':
                 friendlyErrorMessage = 'Demasiados intentos fallidos. Por favor, intenta más tarde.';
                 break;
-            default:
-                // <-- MENSAJE DE ERROR MEJORADO -->
-                friendlyErrorMessage = `Ocurrió un error inesperado. Código: ${error.code}`;
-                break;
         }
         errorMessageDiv.textContent = friendlyErrorMessage;
 
+        // Restaurar el botón
         buttonText.textContent = 'Ingresar';
         buttonSpinner.classList.add('hidden');
         loginButton.disabled = false;
