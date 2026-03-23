@@ -56,17 +56,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
-                        <select id="product-category"
+                        <input type="text" id="product-category" list="category-options"
+                            placeholder="Escoge o escribe una nueva..."
                             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
-                            <option>Combos</option>
-                            <option>Bebidas</option>
-                            <option>Snacks</option>
-                            <option>Cigarros</option>
-                            <option>Chicles</option>
-                            <option>Energéticas</option>
-                            <option>Otros</option>
-                        </select>
+                        <datalist id="category-options"></datalist>
                     </div>
                     <div>
                         <label for="product-estado" class="block text-sm font-medium text-gray-700">Estado</label>
@@ -151,7 +145,7 @@
         </div>
     </main>
 
-    <script type="module" src="admin.js?v=1.2"></script>
+    <script type="module" src="admin.js?v=1.3"></script>
 </body>
 
 </html>

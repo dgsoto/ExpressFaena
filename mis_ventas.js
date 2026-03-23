@@ -1,7 +1,7 @@
 
 import "./auth_guard.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, runTransaction, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- CONFIGURACIÓN ---
 const firebaseConfig = {
@@ -27,8 +27,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 // ... (otros elementos del DOM)
 const customerListContainer = document.getElementById('customer-list-container');
+const searchInput = document.getElementById('search-orders');
 
 let allOrders = []; // Almacenar todos los pedidos para acceder a sus datos
+
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allOrders.filter(o =>
+            (o.customerName || '').toLowerCase().includes(term) ||
+            (o.customerPhone || '').toLowerCase().includes(term) ||
+            (o.orden_id || o.id || '').toLowerCase().includes(term)
+        );
+        renderCustomerList(filtered);
+    });
+}
 
 // --- FUNCIÓN PRINCIPAL DE CAMBIO DE ESTADO ---
 window.updateOrderStatus = async (orderId, newStatus) => {
@@ -97,6 +110,19 @@ window.updateOrderStatus = async (orderId, newStatus) => {
     }
 };
 
+window.deleteOrder = async (orderId) => {
+    if (!orderId) return;
+    if (confirm("🛑 ¿ESTÁS ABSOLUTAMENTE SEGURO de querer ELIMINAR esta orden para siempre?\n\nNota: Si no la has cancelado antes, el stock no se repondrá automáticamente.")) {
+        try {
+            await deleteDoc(doc(db, "pedidos_completos", orderId));
+            showToast('Orden eliminada exitosamente.', 'bg-red-500');
+        } catch (error) {
+            console.error(error);
+            alert("No se pudo eliminar la orden.");
+        }
+    }
+};
+
 
 // --- ESCUCHA Y RENDERIZADO DE DATOS (Adaptado) ---
 onSnapshot(query(collection(db, "pedidos_completos"), orderBy("createdAt", "desc")), (snapshot) => {
@@ -105,8 +131,16 @@ onSnapshot(query(collection(db, "pedidos_completos"), orderBy("createdAt", "desc
         customerListContainer.innerHTML = '<p class="text-center text-gray-500">Aún no hay ventas registradas.</p>';
         return;
     }
-    renderCustomerList(allOrders);
-    // ... (llamadas a otras funciones de renderizado de estadísticas)
+
+    // Actualizar Estadísticas y Gráficos Globales Independiente de la Búsqueda
+    renderAnalytics(allOrders);
+
+    // Check if there is an active search to prevent removing results on live updates
+    if (searchInput && searchInput.value.trim() !== '') {
+        searchInput.dispatchEvent(new Event('input'));
+    } else {
+        renderCustomerList(allOrders);
+    }
 });
 
 function renderCustomerList(orders) {
@@ -134,22 +168,38 @@ function renderCustomerList(orders) {
                 selectOptions += `<option value="${key}" ${key === order.status ? 'selected' : ''}>${ORDER_STATUSES[key].text}</option>`;
             }
 
+            let cleanPhone = (customer.phone || '').replace(/[^\d+]/g, '');
+            if (cleanPhone.startsWith('+')) cleanPhone = cleanPhone.substring(1);
+
+            const whatsappMsg = `https://wa.me/${cleanPhone || ''}?text=Hola%20${encodeURIComponent(customer.name)},%20te%20habló%20de%20Express%20Faena%20por%20tu%20orden%20%23${order.orden_id || order.id}`;
+
             ordersHTML += `
-                <div class="p-3 bg-gray-50 rounded-lg mt-3">
-                    <div class="flex justify-between items-start">
-                       <p class="text-xs text-gray-600">ID: ${order.id}</p>
-                       <span class="${statusInfo.color} text-xs font-bold px-2 py-1 rounded-full">${statusInfo.text}</span>
+                <div class="p-4 bg-gray-50 rounded-xl mt-3 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col md:flex-row justify-between items-start mb-2">
+                       <div>
+                           <a href="${whatsappMsg}" target="_blank" class="text-sm font-black text-green-600 hover:text-green-800 border-b-2 border-green-300 pb-0.5 inline-flex items-center gap-1" title="Hablar por WhatsApp">
+                               <i class="fab fa-whatsapp"></i> ORDEN #${order.orden_id || order.id.substring(0, 8)}
+                           </a>
+                           <p class="text-xs text-gray-400 mt-1">Ref T: ${order.id}</p>
+                       </div>
+                       <div class="flex items-center gap-3 mt-2 md:mt-0">
+                           <span class="${statusInfo.color} shadow-sm text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">${statusInfo.text}</span>
+                           <button onclick="window.deleteOrder('${order.id}')" class="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors" title="Eliminar Orden"><i class="fas fa-trash"></i></button>
+                       </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">${orderDate.toLocaleString('es-CL')}</p>
-                    <p class="font-bold text-lg mt-1">$${order.total.toLocaleString('es-CL')}</p>
-                    <p class="text-xs mt-2"><b>Items:</b> ${order.items.map(i => `${i.quantity}x ${i.nombre}`).join(', ')}</p>
-                    <div class="mt-3">
-                        <label class="text-xs font-semibold">Cambiar Estado:</label>
-                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-1 px-2 text-sm">
+                    <p class="text-xs text-gray-500 mt-1"><i class="far fa-clock"></i> ${orderDate.toLocaleString('es-CL')}</p>
+                    <p class="font-bold text-xl text-gray-800 mt-2">$${order.total.toLocaleString('es-CL')}</p>
+                    <div class="bg-white p-2 rounded-lg border border-gray-100 mt-2">
+                        <p class="text-sm font-semibold text-gray-700 mb-1">Items:</p>
+                        <p class="text-sm text-gray-600">${order.items.map(i => `<span class="inline-block bg-gray-100 px-2 py-0.5 rounded-md mr-1 mb-1">${i.quantity}x ${i.nombre}</span>`).join('')}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <label class="text-xs font-semibold text-gray-600 uppercase tracking-widest">Cambiar Estado:</label>
+                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                             ${selectOptions}
                         </select>
                     </div>
-                     ${order.stockRepuesto ? '<p class="text-xs text-blue-500 mt-2 font-semibold"><i class="fas fa-info-circle"></i> Stock de este pedido fue repuesto.</p>' : ''}
+                     ${order.stockRepuesto ? '<p class="text-xs text-blue-500 mt-3 font-bold bg-blue-50 p-2 rounded-lg border border-blue-100"><i class="fas fa-info-circle"></i> Stock de repuesto devuelto.</p>' : ''}
                 </div>
             `;
         });
@@ -170,7 +220,107 @@ function renderCustomerList(orders) {
 function showToast(message, bgColor) {
     const toast = document.getElementById('toast-notification');
     toast.textContent = message;
-    toast.className = `fixed top-24 right-8 ${bgColor} text-white text-sm font-bold px-4 py-3 rounded-lg shadow-lg`;
+    toast.className = `fixed top-24 right-8 z-[100] ${bgColor} text-white text-sm font-bold px-4 py-3 rounded-lg shadow-xl border border-white/20`;
     toast.classList.remove('hidden');
     setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+}
+
+function renderAnalytics(orders) {
+    let totalRevenue = 0;
+    let completedOrdersCount = 0;
+    let activeOrdersCount = 0;
+    const uniquePhones = new Set();
+    const productCounts = {};
+    const hourCounts = {};
+
+    orders.forEach(order => {
+        // Ignorar cancelados para analíticas "positivas"
+        if (order.status !== 'Cancelado') {
+            activeOrdersCount++;
+
+            const phone = (order.customerPhone || order.id).replace(/[^\d]/g, '');
+            if (phone) uniquePhones.add(phone);
+
+            // Peak Hours (Solo pedidos válidos)
+            if (order.createdAt && order.createdAt.seconds) {
+                const date = new Date(order.createdAt.seconds * 1000);
+                const hour = date.getHours();
+                hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+            }
+
+            // Top Products (Solo pedidos válidos)
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    if (!productCounts[item.nombre]) productCounts[item.nombre] = 0;
+                    productCounts[item.nombre] += item.quantity;
+                });
+            }
+        }
+
+        // Ingresos se calculan SOLO de los completados para ser realistas,
+        // o puedes querer ver todo el potencial de lo "No Cancelado".
+        // Vamos a usar 'Completado' para Ingresos Netos reales.
+        if (order.status === 'Completado') {
+            totalRevenue += (order.total || 0);
+            completedOrdersCount++;
+        }
+    });
+
+    const avgTicket = completedOrdersCount > 0 ? (totalRevenue / completedOrdersCount) : 0;
+
+    // Actualizar Tarjetas DOM
+    const elRevenue = document.getElementById('stats-total-revenue');
+    if (elRevenue) elRevenue.innerText = `$${totalRevenue.toLocaleString('es-CL')}`;
+
+    const elOrders = document.getElementById('stats-total-orders');
+    if (elOrders) elOrders.innerText = activeOrdersCount;
+
+    const elCustomers = document.getElementById('stats-unique-customers');
+    if (elCustomers) elCustomers.innerText = uniquePhones.size;
+
+    const elAvgTicket = document.getElementById('stats-avg-ticket');
+    if (elAvgTicket) elAvgTicket.innerText = `$${Math.round(avgTicket).toLocaleString('es-CL')}`;
+
+    // Renderizar Productos Top 5
+    const topProductsHtml = Object.entries(productCounts)
+        .sort((a, b) => b[1] - a[1]) // De mayor a menor cantidad
+        .slice(0, 5) // Top 5
+        .map(([name, qty]) => `
+            <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 hover:bg-yellow-50 transition-colors">
+                <span class="text-sm font-bold text-gray-700 truncate w-3/4" title="${name}">${name}</span>
+                <span class="text-xs font-black bg-yellow-400 text-black px-2 py-1 rounded-md shadow-sm">${qty} und.</span>
+            </div>
+        `).join('');
+
+    const elTopProducts = document.getElementById('top-products-list');
+    if (elTopProducts) elTopProducts.innerHTML = topProductsHtml || '<p class="text-sm text-gray-500 italic">No hay productos vendidos aún.</p>';
+
+    // Renderizar Horas Pico Top 5
+    const formatHour = (h) => {
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:00 ${ampm}`;
+    };
+
+    const maxCount = Math.max(0, ...Object.values(hourCounts));
+    const peakHoursHtml = Object.entries(hourCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([hour, count]) => {
+            const widthPct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+            return `
+            <div class="flex flex-col mb-3">
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="font-bold text-gray-600"><i class="far fa-clock text-blue-500"></i> ${formatHour(parseInt(hour))}</span>
+                    <span class="text-gray-500 font-semibold">${count} pedido(s)</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 shadow-inner overflow-hidden">
+                    <div class="bg-blue-500 h-2 rounded-full transition-all duration-1000 ease-out" style="width: ${widthPct}%"></div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+    const elPeakHours = document.getElementById('peak-hours-chart');
+    if (elPeakHours) elPeakHours.innerHTML = peakHoursHtml || '<p class="text-sm text-gray-500 italic">No hay horas pico registradas.</p>';
 }

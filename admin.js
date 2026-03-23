@@ -23,6 +23,7 @@ const productForm = document.getElementById('product-form');
 const productIdInput = document.getElementById('product-id');
 const productNameInput = document.getElementById('product-name');
 const productCategoryInput = document.getElementById('product-category');
+const categoryOptionsDatalist = document.getElementById('category-options');
 const productEstadoInput = document.getElementById('product-estado');
 const productPriceInput = document.getElementById('product-price');
 const productStockInput = document.getElementById('product-stock');
@@ -85,8 +86,12 @@ onSnapshot(q, (querySnapshot) => {
         productsList.innerHTML = `<p class="text-center text-gray-500">No hay productos.</p>`;
         return;
     }
+
+    const uniqueCategories = new Set();
+
     querySnapshot.forEach((doc) => {
         const product = doc.data();
+        if (product.categoria) uniqueCategories.add(product.categoria.trim());
         const productId = doc.id;
         const thumbnailUrl = (product.images && product.images.length > 0) ? product.images[0] : 'https://via.placeholder.com/150';
 
@@ -125,6 +130,10 @@ onSnapshot(q, (querySnapshot) => {
             </div>
         `;
     });
+
+    if (categoryOptionsDatalist) {
+        categoryOptionsDatalist.innerHTML = Array.from(uniqueCategories).sort().map(c => `<option value="${c}"></option>`).join('');
+    }
 });
 
 // --- FORM SUBMISSION (CREATE/UPDATE) ---

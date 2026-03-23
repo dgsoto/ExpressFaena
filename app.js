@@ -128,10 +128,16 @@ document.addEventListener('DOMContentLoaded', () => {
             acc[category].push(product);
             return acc;
         }, {});
-        const categoryOrder = ['Combos', 'Bebidas', 'Snacks', 'Cigarros', 'Energéticas', 'Otros'];
+        const dynamicCategories = Object.keys(groupedByCategory).sort((a, b) => {
+            if (a.toLowerCase() === 'combos') return -1;
+            if (b.toLowerCase() === 'combos') return 1;
+            if (a.toLowerCase() === 'otros') return 1;
+            if (b.toLowerCase() === 'otros') return -1;
+            return a.localeCompare(b);
+        });
         catalogoContainer.innerHTML = '';
         let isFirstCategory = true;
-        categoryOrder.forEach(category => {
+        dynamicCategories.forEach(category => {
             if (groupedByCategory[category] && groupedByCategory[category].length > 0) {
                 const section = document.createElement('section');
                 if (!isFirstCategory) {
@@ -570,10 +576,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newStock = (parseInt(item.stock) || 0) - item.quantity;
                 batch.update(productRef, { stock: newStock });
             });
+            const shortOrderId = 'EF-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.random().toString(36).substr(2, 3).toUpperCase();
             const orderRef = doc(collection(db, "pedidos_completos"));
-            batch.set(orderRef, { customerName: name, customerPhone: phone, items: Object.values(grouped).map(i => ({ id: i.id, nombre: i.nombre, quantity: i.quantity, precioFinal: i.precioFinal })), subtotal, deliveryCost, total, deliveryOption, deliveryAddress: customAddress, paymentMethod: finalPaymentMethodStr, observations, createdAt: serverTimestamp(), status: 'Pendiente' });
+            batch.set(orderRef, { orden_id: shortOrderId, customerName: name, customerPhone: phone, items: Object.values(grouped).map(i => ({ id: i.id, nombre: i.nombre, quantity: i.quantity, precioFinal: i.precioFinal })), subtotal, deliveryCost, total, deliveryOption, deliveryAddress: customAddress, paymentMethod: finalPaymentMethodStr, observations, createdAt: serverTimestamp(), status: 'Pendiente' });
             await batch.commit();
-            let msg = `*-- NUEVO PEDIDO EXPRESS FAENA --*\n\n*CLIENTE:* ${name}\n*TELÉFONO:* ${phone}\n\n*PRODUCTOS:*\n${Object.values(grouped).map(item => `• ${item.quantity}x ${item.nombre} ($${item.precioFinal.toLocaleString('es-CL')} c/u)`).join('\n')}\n\n*ENTREGA:* ${deliveryOption === 'faena' ? 'En Faena' : `Otra Dirección (${customAddress})`}\n*PAGO:* ${finalPaymentMethodStr}\n${observations ? `*OBS:* ${observations}\n` : ''}\n--------------------\n*Delivery:* $${deliveryCost.toLocaleString('es-CL')}\n*💰 TOTAL:* $${total.toLocaleString('es-CL')}${extraPaymentInfo}`;
+            let msg = `*--- NUEVA ORDEN: #${shortOrderId} ---*\n\n*CLIENTE:* ${name}\n*TELÉFONO:* ${phone}\n\n*PRODUCTOS:*\n${Object.values(grouped).map(item => `• ${item.quantity}x ${item.nombre} ($${item.precioFinal.toLocaleString('es-CL')} c/u)`).join('\n')}\n\n*ENTREGA:* ${deliveryOption === 'faena' ? 'En Faena' : `Otra Dirección (${customAddress})`}\n*PAGO:* ${finalPaymentMethodStr}\n${observations ? `*OBS:* ${observations}\n` : ''}\n--------------------\n*Delivery:* $${deliveryCost.toLocaleString('es-CL')}\n*💰 TOTAL:* $${total.toLocaleString('es-CL')}${extraPaymentInfo}`;
             window.open(`https://wa.me/${ADMIN_PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
             carrito = [];
             checkoutName.value = '';
