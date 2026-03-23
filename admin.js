@@ -23,6 +23,7 @@ const productForm = document.getElementById('product-form');
 const productIdInput = document.getElementById('product-id');
 const productNameInput = document.getElementById('product-name');
 const productCategoryInput = document.getElementById('product-category');
+const productEstadoInput = document.getElementById('product-estado');
 const productPriceInput = document.getElementById('product-price');
 const productStockInput = document.getElementById('product-stock');
 const productDiscountInput = document.getElementById('product-discount');
@@ -111,7 +112,10 @@ onSnapshot(q, (querySnapshot) => {
                     <div>
                         <p class="font-bold text-gray-800">${offerTypeIndicator} ${product.nombre}</p>
                         <p class="text-sm text-gray-600">$${(product.precio || 0).toLocaleString('es-CL')} - ${product.categoria || 'Sin Cat.'}</p>
-                        <p class="text-xs font-bold ${stockStatus.color} ${stockStatus.bg} px-2 py-0.5 rounded-full inline-block mt-1">Stock: ${stockStatus.text}</p>
+                        <div class="flex gap-2 mt-1">
+                             <p class="text-xs font-bold ${stockStatus.color} ${stockStatus.bg} px-2 py-0.5 rounded-full">Stock: ${stockStatus.text}</p>
+                             <p class="text-xs font-bold ${!product.estado || product.estado === 'activo' ? 'text-green-600 bg-green-100' : 'text-gray-600 bg-gray-200'} px-2 py-0.5 rounded-full">${!product.estado || product.estado === 'activo' ? 'Activo' : 'Inactivo'}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="flex gap-2">
@@ -130,7 +134,7 @@ productForm.addEventListener('submit', async (e) => {
     const id = productIdInput.value;
     const images = productImagesTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
     const tags = productTagsInput.value.split(',').map(tag => tag.trim().toUpperCase()).filter(tag => tag);
-    
+
     const volumeTiers = [];
     const tierDivs = volumePricingContainer.querySelectorAll('div');
     tierDivs.forEach(tier => {
@@ -146,6 +150,7 @@ productForm.addEventListener('submit', async (e) => {
     const productData = {
         nombre: productNameInput.value.trim(),
         categoria: productCategoryInput.value.trim(),
+        estado: productEstadoInput.value,
         precio: parseFloat(productPriceInput.value),
         stock: parseInt(productStockInput.value),
         descuento: parseInt(productDiscountInput.value) || 0,
@@ -155,7 +160,7 @@ productForm.addEventListener('submit', async (e) => {
         images: images,
         precios_por_volumen: volumeTiers
     };
-    
+
     if (productData.precios_por_volumen.length > 0) {
         productData.descuento = 0;
     }
@@ -191,6 +196,7 @@ window.editProduct = async (id) => {
             productIdInput.value = id;
             productNameInput.value = p.nombre;
             productCategoryInput.value = p.categoria;
+            productEstadoInput.value = p.estado || 'activo';
             productPriceInput.value = p.precio;
             productStockInput.value = p.stock;
             productDiscountInput.value = p.descuento || '';
@@ -215,8 +221,8 @@ window.editProduct = async (id) => {
             }
             toggleOfferInputs();
             if (productDiscountInput.value) {
-                 addVolumePriceBtn.disabled = true;
-                 addVolumePriceBtn.classList.add('opacity-50');
+                addVolumePriceBtn.disabled = true;
+                addVolumePriceBtn.classList.add('opacity-50');
             }
 
             formTitle.innerText = "Editando Producto";
@@ -248,6 +254,7 @@ window.deleteProduct = async (id) => {
 window.resetForm = () => {
     productForm.reset();
     productIdInput.value = '';
+    productEstadoInput.value = 'activo';
     volumePricingContainer.innerHTML = ''; // Clear volume tiers
     productDiscountInput.disabled = false;
     productDiscountInput.classList.remove('bg-gray-200');

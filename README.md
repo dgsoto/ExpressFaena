@@ -1,56 +1,46 @@
-# Express Faena: PWA de E-commerce de Hiper-Conversión para Nichos de Mercado
+<h1 align="center">Express Faena</h1>
 
-**Express Faena** no es solo una tienda online; es una Progressive Web App (PWA) de alto rendimiento, diseñada con un enfoque *mobile-first* y construida para un nicho de mercado específico y de alta demanda: el suministro de productos esenciales para trabajadores mineros (`faeneros`) en localidades remotas de Chile.
+<p align="center">
+  <strong>La Tienda Online Express: Rápida, Intuitiva y Orientada a la Acción</strong>
+</p>
 
-La plataforma entera fue construida alrededor de un único objetivo central: **maximizar la velocidad de venta eliminando toda fricción**. El canal principal de ventas y comunicación es WhatsApp, apalancando una aplicación que el público objetivo ya usa y en la que confía.
-
----
-
-## Estrategia de Negocio y Filosofía Central
-
-El diseño del proyecto está arraigado en principios probados de psicología de e-commerce y en un profundo entendimiento del contexto del usuario objetivo (tiempo limitado, conectividad potencialmente baja, necesidades inmediatas).
-
-### 1. Proceso de Compra sin Fricción a través de WhatsApp
-El flujo convencional "agregar al carrito -> checkout -> ingresar envío -> pagar" es un asesino de conversiones en este contexto. Nosotros lo hemos eliminado por completo.
-
-*   **"¡Lo Quiero Ya!":** Un botón de alta visibilidad y un solo clic en cada tarjeta de producto que genera instantáneamente un mensaje de pedido pre-llenado para WhatsApp. Esto reduce el tiempo de compra a meros segundos.
-*   **Interfaz Familiar:** Todas las transacciones y comunicaciones se finalizan en WhatsApp, una plataforma confiable y omnipresente, lo que elimina la necesidad de crear cuentas de usuario, restablecer contraseñas o aprender a usar un nuevo sistema.
-
-### 2. Interfaz de Usuario (UI) Orientada a la Conversión
-La tienda es un motor de ventas meticulosamente diseñado donde cada píxel tiene el propósito de impulsar una acción y construir confianza.
-
-*   **Gatillos Psicológicos:** La UI está saturada con señales visuales diseñadas para acelerar la decisión de compra:
-    *   **Escasez:** Los productos con poco stock son marcados automáticamente con *"¡Quedan X unidades!"* para crear urgencia.
-    *   **Prueba Social (Social Proof):** Las calificaciones con estrellas (ej: ⭐⭐⭐⭐⭐) construyen confianza inmediata y señalan calidad.
-    *   **FOMO (Miedo a quedarse fuera):** Insignias de alto contraste para **"🔥 Más Vendido"** y **"Oferta"** atraen la mirada hacia productos clave.
-    *   **Percepción de Valor:** El cálculo automático de descuentos (`-15%`) con el precio original visiblemente tachado hace que la propuesta de valor sea innegable.
-*   **Organización Estratégica de Productos:** Las categorías de productos se muestran en un orden específico e intencional. Los productos de alto margen como los **"Combos"** se posicionan al principio para maximizar el Valor Promedio de Pedido (AOV).
-
-### 3. Sistema de Inventario Impulsado por el Cliente
-En lugar de adivinar lo que el mercado quiere, dejamos que el mercado nos lo diga directamente.
-
-*   **Caja de Sugerencias Integrada:** Un campo de texto simple permite a los clientes solicitar productos que no están actualmente en la tienda.
-*   **Ciclo de Retroalimentación Accionable:** Estas sugerencias se agregan en un panel de administración dedicado, agrupadas y clasificadas automáticamente por popularidad.
-*   **Creación de Productos con un Clic:** Un administrador puede convertir la sugerencia más solicitada en un nuevo producto con un solo clic, respondiendo instantáneamente a la demanda del cliente y minimizando las oportunidades de venta perdidas.
+<p align="center">
+  <img src="icons/icon-512.png" width="120" alt="Express Faena Logo" />
+</p>
 
 ---
 
-## Descripción Técnica y Arquitectura
+## 🚀 Sobre la Tienda
 
-La arquitectura está diseñada para velocidad, confiabilidad y un bajo costo de mantenimiento.
+**Express Faena** es un modelo de e-commerce moderno, ligero y construido con una filosofía de hiper-conversión. Su propósito es proveer insumos, snacks y productos esenciales a trabajadores y personas en faenas o zonas de acceso limitado, garantizando una experiencia de compra inmediata y sin fricciones. 
 
-*   **Frontend:** Un stack de JavaScript puro (vanilla), HTML5 y TailwindCSS. Esto crea una experiencia de usuario increíblemente rápida y ligera. No hay dependencia de frameworks pesados, asegurando un rendimiento óptimo en dispositivos móviles de gama baja y en condiciones de red deficientes.
-*   **Backend y Base de Datos:** Google Firebase (Firestore) funciona como el backend en tiempo real. Esta arquitectura *serverless* permite:
-    *   Actualizaciones instantáneas de listados de productos, precios y niveles de stock.
-    *   Un sistema dinámico de mensajes en la cabecera para promociones en tiempo real.
-    *   Sincronización de datos fluida entre la tienda y los paneles de administración.
-*   **Progressive Web App (PWA):** La aplicación es una PWA con todas las funcionalidades, proporcionando:
-    *   **Capacidad Offline:** La tienda permanece accesible incluso con conexión a internet intermitente o nula.
-    *   **Instalación en Pantalla de Inicio:** Los usuarios pueden agregar "Express Faena" a la pantalla de inicio de su teléfono, haciéndola tan accesible como una aplicación nativa.
+Actualmente lista para operar y desplegar clientes reales utilizando una infraestructura gratuita y escalable a través de **GitHub Pages**, convirtiéndose en una herramienta comercial activa que procesa pedidos directamente a WhatsApp con cálculos y organización precisa en tiempo real.
 
-## Kit de Herramientas de Administración y Operaciones
+---
 
-El proyecto incluye un conjunto de herramientas internas potentes y fáciles de usar que proporcionan control total sobre el negocio sin necesidad de conocimientos técnicos.
+## ⚡ Características Principales (Features)
 
-*   **Panel de Productos Completo (`admin.html`):** Una interfaz CRUD (Crear, Leer, Actualizar, Eliminar) completa para gestionar el catálogo de productos. Aquí es donde se controlan todos los atributos de marketing (descuentos, insignias, niveles de stock).
-*   **Panel de Gestión de Sugerencias (`sugerencias.html`):** Una herramienta estratégica para ver, gestionar y actuar sobre la retroalimentación de los clientes, convirtiendo las solicitudes directamente en ingresos.
+Esta tienda en línea cuenta con herramientas nativas avanzadas, integrando una experiencia de usuario de nivel premium sin necesidad de registrar o crear complejas cuentas de usuario.
+
+### 🛒 Checkout Optimizado y Frictionless
+- **Pedidos Directos al WhatsApp:** Al finalizar la compra, el cliente envía un recibo ordenado, detallado y completamente pre-calculado, directo al teléfono del administrador, acelerando la decisión de compra en segundos.
+- **Opciones de Entrega Dinámicas:** Los clientes pueden elegir entre recoger su pedido "En Faena" (sin costo) o ingresar una "Otra Dirección Geográfica" con un cálculo de comisiones integradas con validación estricta de formulario.
+- **Cálculo de Transacciones Ocultas:** Si el usuario elige "Link Mercado Pago", la tienda ajusta automáticamente el total sumando los pequeños porcentajes de margen sin recargar líneas adicionales al recibo, haciendo que todo se mantenga limpio y claro. La información fluye automáticamente estructurada con números de cuentas según el método de pago seleccionado.
+- **Micro-interacciones y UI Avanzada:** Todas las validaciones de datos y de stock muestran exclusivas ventanas de notificaciones (`toasts`) animadas que reemplazan por completo las alertas intrusivas y aburridas del navegador.
+
+### 📢 Comunicación y Engagement
+- **Banner Rotativo en Vivo:** Una sección superior dinámica y animada en la que el administrador puede lanzar avisos, alertas de ofertas y recordatorios en tiempo real.
+- **Módulo de Pedidos Extras / Antojos:** Los clientes tienen a disposición un canal para solictar insumos o cigarros que no se visualizan en catálogo. Estos "encargos" fluyen directamente al requerimiento oficial por una comisión a acordar con el repartidor.
+- **Panel de Sugerencias Interactivo:** Permite capturar inteligentemente el deseo del consumidor. El cliente envía un pedido de producto que quiere ver la tienda en el futuro y, tras una sutil animación verde, dicha solicitud queda agendada.
+
+### 📱 Experiencia App Nativa (PWA Instable)
+- **Cero Instalaciones Desde Tiendas de Apps:** Aprovechando los últimos estándares PWA (`Progressive Web App`), los clientes pueden instalar la tienda tocando *"Agregar al inicio"* directamente en Chrome o Safari. Express Faena se alojará entre las Apps del celular del cliente, utilizando el Logo/Ícono oficial desarrollado en marca.
+- **Diseño Mobile-First:** Preparado visualmente con proporciones táctiles y colores de alto contraste que prioriza la experiencia en teléfonos por sobre la de ordenadores, donde reside el 90% del segmento objetivo.
+
+### 🛠️ SEO Completo (Posicionamiento Inteligente)
+- Código equipado con _Open Graph (OG)_ preconfigurado y metaetiquetas precisas.
+- Al compartir la página por WhatsApp, Facebook o chats grupales, el enlace se transformará inmediatamente en una tarjeta informativa visual con descripción propia, en lugar del clásico y aburrido hipervínculo azul.
+
+---
+
+> _**Nota Operativa:** Este frontend se comunica con una base de datos Firebase privada para la administración de stock, control de vendedores y seguimiento histórico de los ingresos con reportes visuales._

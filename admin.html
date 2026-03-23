@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Express Faena</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
+
 <body class="bg-gray-100 font-sans">
 
     <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
@@ -26,43 +29,68 @@
             <h2 id="form-title" class="text-xl font-bold mb-4">Agregar Nuevo Producto</h2>
             <form id="product-form" class="space-y-4">
                 <input type="hidden" id="product-id">
-                
+
                 <div>
-                    <label for="product-name" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
-                    <input type="text" id="product-name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <label for="product-name" class="block text-sm font-medium text-gray-700">Nombre del
+                        Producto</label>
+                    <input type="text" id="product-name"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="product-price" class="block text-sm font-medium text-gray-700">Precio Base</label>
-                        <input type="number" id="product-price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <input type="number" id="product-price"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
                     </div>
                     <div>
                         <label for="product-stock" class="block text-sm font-medium text-gray-700">Stock Inicial</label>
-                        <input type="number" id="product-stock" min="0" placeholder="Ej: 50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <input type="number" id="product-stock" min="0" placeholder="Ej: 50"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
                     </div>
-                </div>
-
-                <div>
-                    <label for="product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
-                    <select id="product-category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                        <option>Combos</option>
-                        <option>Bebidas</option>
-                        <option>Snacks</option>
-                        <option>Cigarros</option>
-                        <option>Energéticas</option>
-                        <option>Otros</option>
-                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                     <div>
-                        <label for="product-discount" class="block text-sm font-medium text-gray-700">Descuento % (Opcional)</label>
-                        <input type="number" id="product-discount" placeholder="Ej: 15" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <div>
+                        <label for="product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                        <select id="product-category"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                            <option>Combos</option>
+                            <option>Bebidas</option>
+                            <option>Snacks</option>
+                            <option>Cigarros</option>
+                            <option>Chicles</option>
+                            <option>Energéticas</option>
+                            <option>Otros</option>
+                        </select>
                     </div>
-                     <div>
-                        <label for="product-stars" class="block text-sm font-medium text-gray-700">Estrellas (1-5, Opcional)</label>
-                        <input type="number" id="product-stars" max="5" min="1" placeholder="Ej: 5" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <div>
+                        <label for="product-estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                        <select id="product-estado"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                            <option value="activo">Activo (Visible)</option>
+                            <option value="inactivo">Inactivo (Oculto)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="product-discount" class="block text-sm font-medium text-gray-700">Descuento %
+                            (Opcional)</label>
+                        <input type="number" id="product-discount" placeholder="Ej: 15"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="product-stars" class="block text-sm font-medium text-gray-700">Estrellas (1-5,
+                            Opcional)</label>
+                        <input type="number" id="product-stars" max="5" min="1" placeholder="Ej: 5"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                 </div>
 
@@ -70,10 +98,12 @@
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <div class="flex justify-between items-center">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Precios por Volumen (Opcional)</label>
+                            <label class="block text-sm font-medium text-gray-700">Precios por Volumen
+                                (Opcional)</label>
                             <p class="text-xs text-gray-500">Desactiva el descuento % si se usa.</p>
                         </div>
-                        <button type="button" id="add-volume-price-tier" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ Añadir Tramo</button>
+                        <button type="button" id="add-volume-price-tier"
+                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ Añadir Tramo</button>
                     </div>
                     <div id="volume-pricing-container" class="space-y-2 mt-2">
                         <!-- Los tramos de precios se añadirán aquí dinámicamente -->
@@ -81,23 +111,33 @@
                 </div>
 
                 <div>
-                    <label for="product-tags" class="block text-sm font-medium text-gray-700">Etiquetas (separadas por coma)</label>
-                    <input type="text" id="product-tags" placeholder="Ej: OFERTA, NUEVO, MÁS VENDIDO" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-
-                 <div>
-                    <label for="product-video" class="block text-sm font-medium text-gray-700">URL Video (Opcional)</label>
-                    <input type="url" id="product-video" placeholder="https://..." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <label for="product-tags" class="block text-sm font-medium text-gray-700">Etiquetas (separadas por
+                        coma)</label>
+                    <input type="text" id="product-tags" placeholder="Ej: OFERTA, NUEVO, MÁS VENDIDO"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
 
                 <div>
-                    <label for="product-images" class="block text-sm font-medium text-gray-700">URLs de Imágenes (una por línea)</label>
-                    <textarea id="product-images" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                    <label for="product-video" class="block text-sm font-medium text-gray-700">URL Video
+                        (Opcional)</label>
+                    <input type="url" id="product-video" placeholder="https://..."
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-                
+
+                <div>
+                    <label for="product-images" class="block text-sm font-medium text-gray-700">URLs de Imágenes (una
+                        por línea)</label>
+                    <textarea id="product-images" rows="3"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                </div>
+
                 <div class="flex gap-2">
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar Producto</button>
-                    <button type="button" id="cancel-edit" class="hidden w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar Edición</button>
+                    <button type="submit"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Guardar
+                        Producto</button>
+                    <button type="button" id="cancel-edit"
+                        class="hidden w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar
+                        Edición</button>
                 </div>
             </form>
         </div>
@@ -111,6 +151,7 @@
         </div>
     </main>
 
-    <script type="module" src="admin.js"></script>
+    <script type="module" src="admin.js?v=1.2"></script>
 </body>
+
 </html>

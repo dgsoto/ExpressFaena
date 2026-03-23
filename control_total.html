@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centro de Comando | Express Faena</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
+
 <body class="bg-gray-900 font-sans text-white hidden">
 
     <header class="bg-black p-6 shadow-md">
@@ -16,7 +19,8 @@
                 <h1 class="text-2xl font-black text-white">🚀 Centro de Comando</h1>
                 <p id="user-email" class="text-sm text-yellow-400"></p>
             </div>
-            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+            <button id="logout-button"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
             </button>
@@ -29,7 +33,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             <!-- Tarjeta: Gestionar Productos -->
-            <a href="admin.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="admin.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-blue-500 p-3 rounded-lg">
                         <i class="fas fa-edit fa-2x"></i>
@@ -42,7 +47,8 @@
             </a>
 
             <!-- Tarjeta: Control de Stock -->
-            <a href="control_de_stock.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="control_de_stock.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-green-500 p-3 rounded-lg">
                         <i class="fas fa-boxes fa-2x"></i>
@@ -55,7 +61,8 @@
             </a>
 
             <!-- Tarjeta: Analizar Ventas -->
-            <a href="mis_ventas.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="mis_ventas.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-purple-500 p-3 rounded-lg">
                         <i class="fas fa-chart-line fa-2x"></i>
@@ -68,7 +75,8 @@
             </a>
 
             <!-- Tarjeta: Ver Sugerencias -->
-            <a href="sugerencias.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="sugerencias.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-yellow-500 p-3 rounded-lg">
                         <i class="fas fa-lightbulb fa-2x"></i>
@@ -81,7 +89,8 @@
             </a>
 
             <!-- Tarjeta: Administrar Vendedores -->
-            <a href="gestion_vendedores.html" id="admin-only-section" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="gestion_vendedores.html" id="admin-only-section"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-red-500 p-3 rounded-lg">
                         <i class="fas fa-users-cog fa-2x"></i>
@@ -94,7 +103,8 @@
             </a>
 
             <!-- Tarjeta: Mensajes -->
-            <a href="mensajes.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="mensajes.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-teal-500 p-3 rounded-lg">
                         <i class="fas fa-envelope-open-text fa-2x"></i>
@@ -107,7 +117,8 @@
             </a>
 
             <!-- Tarjeta: Reportes -->
-            <a href="reportes.html" class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+            <a href="reportes.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
                 <div class="flex items-center gap-4">
                     <div class="bg-indigo-500 p-3 rounded-lg">
                         <i class="fas fa-file-alt fa-2x"></i>
@@ -119,10 +130,25 @@
                 </div>
             </a>
 
+            <!-- Tarjeta: Proveedores -->
+            <a href="proveedores.html"
+                class="bg-gray-800 rounded-2xl shadow-lg p-6 hover:bg-gray-700 hover:scale-105 transition-all duration-300 ease-in-out">
+                <div class="flex items-center gap-4">
+                    <div class="bg-orange-500 p-3 rounded-lg">
+                        <i class="fas fa-truck-loading fa-2x"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">Proveedores</h2>
+                        <p class="text-gray-400 text-sm">Gestionar contactos y pedidos a externos.</p>
+                    </div>
+                </div>
+            </a>
+
         </div>
     </main>
 
     <!-- Se necesita un guardián de autenticación y lógica para cerrar sesión -->
     <script type="module" src="auth_guard.js"></script>
 </body>
+
 </html>
