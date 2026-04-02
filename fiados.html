@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créditos y Fiados | Express Faena</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤝</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Componente de Toasts -->
+    <style>
+        @keyframes slideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="toast-container" class="fixed top-4 left-0 right-0 flex flex-col items-center gap-2 z-[9999] pointer-events-none"></div>
+
+    <header class="bg-black p-6 shadow-md sticky top-0 z-50 rounded-b-2xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-pink-500 flex items-center gap-2">
+                <i class="fas fa-handshake"></i> CRÉDITOS Y FIADOS
+            </h1>
+            <a href="control_total.html" class="text-sm text-white hover:text-pink-400 flex items-center gap-2 font-bold">
+                <i class="fas fa-arrow-left"></i> Volver al Menú
+            </a>
+        </div>
+    </header>
+
+    <main class="p-4 md:p-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Columna: Nuevo Registro -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-2xl shadow-sm sticky top-28 border border-gray-200">
+                    <h2 class="text-xl font-black mb-4 text-gray-800 border-b pb-2"><i class="fas fa-plus-circle text-pink-500"></i> Nuevo Fiado</h2>
+                    <form id="fiado-form" class="space-y-4">
+                        <input type="hidden" id="fiado-id">
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Compañero (Cliente)</label>
+                            <input type="text" id="fiado-name" placeholder="Ej: Juan Pérez" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Teléfono (Solo números)</label>
+                            <input type="number" id="fiado-phone" placeholder="56912345678" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Detalle de la Compra</label>
+                            <textarea id="fiado-details" rows="2" placeholder="Ej: 2 Redbull, 1 Galleta" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none" required></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700">Monto del Pedido ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-500 font-bold">$</span>
+                                <input type="number" id="fiado-amount" placeholder="0" class="pl-8 mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none" min="1" required>
+                            </div>
+                        </div>
+
+                        <button id="fiado-submit-btn" type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-black py-3 rounded-lg shadow-md transition-colors text-lg uppercase tracking-wide">
+                            <i class="fas fa-save"></i> Registrar Deuda
+                        </button>
+                        <button id="fiado-cancel-btn" type="button" class="hidden w-full mt-2 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 rounded-lg shadow-md transition-colors">
+                            Cancelar Edición
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Columna: Lista de Deudores -->
+            <div class="lg:col-span-2">
+                
+                <!-- Resumen Global -->
+                <div class="bg-pink-600 rounded-2xl shadow-md p-6 mb-8 text-white flex justify-between items-center">
+                    <div>
+                        <p class="text-pink-200 font-bold uppercase tracking-wider text-sm">Total por Cobrar</p>
+                        <p id="total-street-money" class="text-4xl font-black">$0</p>
+                    </div>
+                    <i class="fas fa-piggy-bank text-5xl text-pink-400 opacity-50"></i>
+                </div>
+
+                <div class="flex justify-between items-end mb-4">
+                    <h2 class="text-2xl font-black text-gray-800">Cuentas Pendientes</h2>
+                    <input type="text" id="search-fiados" placeholder="Buscar compañero..." class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-pink-500 outline-none w-1/2 max-w-xs text-sm">
+                </div>
+                
+                <!-- Container Principal -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex gap-2 bg-gray-200 p-1 rounded-xl">
+                        <button id="tab-pendientes" class="bg-white text-pink-600 shadow-sm px-4 py-2 rounded-lg font-bold text-sm transition-all">Pendientes</button>
+                        <button id="tab-pagados" class="text-gray-600 hover:bg-gray-300 px-4 py-2 rounded-lg font-bold text-sm transition-all">Historial Pagados</button>
+                    </div>
+                    <button id="btn-export-contacts" class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i class="fab fa-whatsapp"></i> Exportar Contactos
+                    </button>
+                </div>
+                
+                <div id="fiados-list" class="space-y-6">
+                    <p class="text-center text-gray-500 mt-10"><i class="fas fa-spinner fa-spin"></i> Cargando cuentas...</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="fiados.js?v=1.0"></script>
+</body>
+</html>

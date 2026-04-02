@@ -540,8 +540,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const grouped = getGroupedCart();
         if (Object.keys(grouped).length === 0) return showToast("Tu carrito está vacío.", "error");
         const name = checkoutName.value.trim();
-        const phone = checkoutPhone.value.trim();
-        if (!name || !phone || phone.length < 12) return showToast("Por favor, completa tu Nombre y Teléfono de WhatsApp válido (+569...).", "error");
+        let phone = checkoutPhone.value.trim();
+        if(!phone || phone === '+569') phone = 'No Especificado';
+        if (!name) return showToast("Por favor, ingresa tu Nombre o Alias para el pedido.", "error");
         const deliveryOption = document.querySelector('input[name="delivery-option"]:checked').value;
         const customAddress = deliveryOption === 'otro' ? (get('custom-address')?.value.trim() || '') : '';
         if (deliveryOption === 'otro' && !customAddress) return showToast("Por favor, ingresa la dirección exacta de entrega.", "error");
@@ -581,7 +582,13 @@ document.addEventListener('DOMContentLoaded', () => {
             batch.set(orderRef, { orden_id: shortOrderId, customerName: name, customerPhone: phone, items: Object.values(grouped).map(i => ({ id: i.id, nombre: i.nombre, quantity: i.quantity, precioFinal: i.precioFinal })), subtotal, deliveryCost, total, deliveryOption, deliveryAddress: customAddress, paymentMethod: finalPaymentMethodStr, observations, createdAt: serverTimestamp(), status: 'Pendiente' });
             await batch.commit();
             let msg = `*--- NUEVA ORDEN: #${shortOrderId} ---*\n\n*CLIENTE:* ${name}\n*TELÉFONO:* ${phone}\n\n*PRODUCTOS:*\n${Object.values(grouped).map(item => `• ${item.quantity}x ${item.nombre} ($${item.precioFinal.toLocaleString('es-CL')} c/u)`).join('\n')}\n\n*ENTREGA:* ${deliveryOption === 'faena' ? 'En Faena' : `Otra Dirección (${customAddress})`}\n*PAGO:* ${finalPaymentMethodStr}\n${observations ? `*OBS:* ${observations}\n` : ''}\n--------------------\n*Delivery:* $${deliveryCost.toLocaleString('es-CL')}\n*💰 TOTAL:* $${total.toLocaleString('es-CL')}${extraPaymentInfo}`;
-            window.open(`https://wa.me/${ADMIN_PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            
+            showToast(`¡Excelente ${name}! Tu pedido se generó correctamente.`, "success");
+            
+            // Delay slightly to let the user see the success toast before sending them out to Whatsapp
+            setTimeout(() => {
+                window.open(`https://wa.me/${ADMIN_PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            }, 1000);
             carrito = [];
             checkoutName.value = '';
             checkoutObservations.value = '';
