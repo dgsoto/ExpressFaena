@@ -38,6 +38,14 @@
                         <input type="hidden" id="fiado-id">
                         
                         <div>
+                            <label class="block text-sm font-bold text-gray-700">Tipo de Registro</label>
+                            <select id="fiado-tipo" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none bg-gray-50 text-gray-800 font-bold">
+                                <option value="deuda">🛒 Nueva Compra (Deuda)</option>
+                                <option value="abono">💰 Pago Adelantado (Abono)</option>
+                            </select>
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-bold text-gray-700">Compañero (Cliente)</label>
                             <input type="text" id="fiado-name" placeholder="Ej: Juan Pérez" class="mt-1 w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-pink-500 outline-none" required>
                         </div>

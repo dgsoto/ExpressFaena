@@ -19,6 +19,7 @@ const db = getFirestore(app);
 // --- DOM ELEMENTS ---
 const form = document.getElementById('fiado-form');
 const fiadoIdInput = document.getElementById('fiado-id');
+const tipoInput = document.getElementById('fiado-tipo');
 const nameInput = document.getElementById('fiado-name');
 const phoneInput = document.getElementById('fiado-phone');
 const detailsInput = document.getElementById('fiado-details');
@@ -82,8 +83,15 @@ function groupFiadosByClient(fiadosArray) {
         }
         
         const amount = Number(f.amount) || 0;
-        groups[key].totalDebt += amount;
-        globalTotal += amount;
+        
+        if (f.esAbono) {
+            groups[key].totalDebt -= amount;
+            globalTotal -= amount;
+        } else {
+            groups[key].totalDebt += amount;
+            globalTotal += amount;
+        }
+        
         groups[key].records.push(f);
     });
 
@@ -123,13 +131,17 @@ function renderGroups() {
 
         let recordsHTML = group.records.map(r => {
             const rDate = r.createdAt && r.createdAt.seconds ? new Date(r.createdAt.seconds * 1000).toLocaleDateString('es-CL', {day:'2-digit', month:'short'}) : 'N/A';
+            const isAbono = r.esAbono === true;
+            
             return `
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 rounded-md group">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 rounded-md group ${isAbono ? 'bg-green-50/30' : ''}">
                     <div class="w-full md:w-3/4 mb-2 md:mb-0">
-                        <p class="text-sm font-bold text-gray-700">${rDate} <span class="text-gray-400 font-normal">|</span> ${r.details}</p>
+                        <p class="text-sm font-bold ${isAbono ? 'text-green-700' : 'text-gray-700'}">${rDate} <span class="text-gray-400 font-normal">|</span> ${r.details}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <p class="text-sm font-black ${currentView === 'Pagado' ? 'text-gray-400' : 'text-pink-600'}">$${Number(r.amount).toLocaleString('es-CL')}</p>
+                        <p class="text-sm font-black ${currentView === 'Pagado' ? 'text-gray-400' : (isAbono ? 'text-green-600' : 'text-pink-600')}">
+                            ${isAbono ? '-' : ''}$${Number(r.amount).toLocaleString('es-CL')}
+                        </p>
                         <div class="flex gap-2">
                            <button onclick="window.populateFiadoForm('${r.id}')" class="text-blue-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Editar este ticket"><i class="fas fa-edit"></i></button>
                            <button onclick="window.deleteFiado('${r.id}')" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Eliminar permanentemente"><i class="fas fa-trash"></i></button>
@@ -139,16 +151,23 @@ function renderGroups() {
             `;
         }).join('');
 
+        const positiveDebtRecords = group.records.filter(r => !r.esAbono).map(r=>r.details).join(' / ');
+        const totalAbonosGenerados = group.records.filter(r => r.esAbono).reduce((sum, r) => sum + Number(r.amount), 0);
+        const detailMsg = totalAbonosGenerados > 0 ? `(Compras: ${positiveDebtRecords}. Abonos a favor: $${totalAbonosGenerados.toLocaleString('es-CL')})` : `(Detalle: ${positiveDebtRecords})`;
+
         const whatsappMsg = currentView === 'Pendiente' ? 
-            `https://wa.me/${group.phone}?text=${encodeURIComponent(`Hola ${group.name}, te saludo de Express Faena. 🎒\n\nTe escribo para enviarte el detalle de tu cuenta actual:\n\n*Total Pendiente: $${group.totalDebt.toLocaleString('es-CL')}*\n\n*(Detalle: ${group.records.map(r=>r.details).join(' / ')})*\n\n¿Por favor me avisas cuando tengas disponibilidad para liquidarlo? ¡Muchas gracias! 🚀`)}` :
-            `https://wa.me/${group.phone}?text=${encodeURIComponent(`Hola ${group.name}, te escribo de Express Faena solo para darte las gracias por el pago de tu cuenta de $${group.totalDebt.toLocaleString('es-CL')}. ¡Muchas gracias por tu responsabilidad! Seguimos a tu disposición. 🎒`)}`;
+            `https://wa.me/${group.phone}?text=${encodeURIComponent(`Hola ${group.name}, te saludo de Express Faena. 🎒\n\nTe escribo para enviarte el detalle de tu cuenta actual:\n\n*Total Pendiente: $${group.totalDebt.toLocaleString('es-CL')}*\n\n*${detailMsg}*\n\n¿Por favor me avisas cuando tengas disponibilidad para liquidarlo? ¡Muchas gracias! 🚀`)}` :
+            `https://wa.me/${group.phone}?text=${encodeURIComponent(`Hola ${group.name}, te escribo de Express Faena solo para darte las gracias por el pago de tu cuenta. ¡Muchas gracias por tu responsabilidad! Seguimos a tu disposición. 🎒`)}`;
 
         const actionButtons = currentView === 'Pendiente' ? `
+            <button onclick="window.prepareAbono('${group.phone}', '${group.name}')" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
+                <i class="fas fa-hand-holding-usd text-lg"></i> Registrar Abono
+            </button>
             <a href="${whatsappMsg}" target="_blank" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
                 <i class="fab fa-whatsapp text-lg"></i> Enviar Recordatorio
             </a>
-            <button onclick="window.markAllAsPaid('${group.phone}', '${group.name}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
-                <i class="fas fa-check-double"></i> Saldar Cuenta Completa
+            <button onclick="window.markAllAsPaid('${group.phone}', '${group.name}')" class="w-full md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
+                <i class="fas fa-check-double"></i> Saldar Cuenta Completa ($${group.totalDebt.toLocaleString('es-CL')})
             </button>
         ` : `
             <a href="${whatsappMsg}" target="_blank" class="w-full md:col-span-2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm text-sm">
@@ -187,6 +206,22 @@ function renderGroups() {
 
 // --- TABS Y EVENTOS ---
 searchInput.addEventListener('input', renderGroups);
+
+// Auto-cambiar placeholder según el "Tipo" de registro seleccionado
+tipoInput.addEventListener('change', (e) => {
+    if(e.target.value === 'abono') {
+        detailsInput.value = "Pago/Abono de Deuda";
+        submitBtn.innerHTML = '<i class="fas fa-hand-holding-usd"></i> Registrar Abono';
+        submitBtn.classList.replace('bg-pink-600', 'bg-indigo-600');
+        submitBtn.classList.replace('hover:bg-pink-700', 'hover:bg-indigo-700');
+    } else {
+        detailsInput.value = "";
+        detailsInput.placeholder = "Ej: 2 Redbull, 1 Galleta";
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Registrar Deuda';
+        submitBtn.classList.replace('bg-indigo-600', 'bg-pink-600');
+        submitBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-pink-700');
+    }
+});
 
 tabPendientes.addEventListener('click', () => {
     currentView = 'Pendiente';
@@ -234,6 +269,20 @@ const resetFiadoForm = () => {
 
 cancelBtn.addEventListener('click', resetFiadoForm);
 
+// --- PREPARE ABONO FROM CARD SHORTCUT ---
+window.prepareAbono = (phone, name) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    resetFiadoForm();
+    nameInput.value = name;
+    phoneInput.value = phone;
+    tipoInput.value = 'abono';
+    
+    // Trigger dispatch so the colors change dynamically
+    const event = new Event('change');
+    tipoInput.dispatchEvent(event);
+    amountInput.focus();
+};
+
 // --- CREATE OR UPDATE DEBT ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -242,12 +291,15 @@ form.addEventListener('submit', async (e) => {
     let phoneNum = phoneInput.value.replace(/\D/g, '');
     if (!phoneNum.startsWith('569') && phoneNum.length === 8) phoneNum = '569' + phoneNum;
     
+    const isAbono = tipoInput.value === 'abono';
+
     const data = {
         name: nameInput.value.trim(),
         phone: phoneNum,
         details: detailsInput.value.trim(),
         amount: Number(amountInput.value),
         estado: 'Pendiente',
+        esAbono: isAbono,
         createdAt: serverTimestamp()
     };
 
@@ -260,13 +312,14 @@ form.addEventListener('submit', async (e) => {
                 name: data.name,
                 phone: data.phone,
                 details: data.details,
-                amount: data.amount
+                amount: data.amount,
+                esAbono: data.esAbono
             });
             showToast(`Registro de ${data.name} actualizado.`, 'success');
         } else {
             // Add New Fiado
             await addDoc(collection(db, "fiados"), data);
-            showToast(`Fiado de $${data.amount} agregado a ${data.name}.`, 'success');
+            showToast(`Registro de $${data.amount} agregado a la cuenta de ${data.name}.`, 'success');
         }
         resetFiadoForm();
         nameInput.focus();
